@@ -43,9 +43,10 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 .field label{ font-size:13px; color:var(--muted); margin-bottom:4px; }
 .field input[type="number"],
 .field input[type="date"]{
-  width:150px; max-width:100%; font-size:16px; padding:6px 8px;
+  width:var(--fieldw); max-width:100%; font-size:16px; padding:6px 8px;
   border:1px solid #e5e7eb; border-radius:10px; font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
 }
+.field input[type="date"]{ width:120px; }
 .hint{ color:var(--muted); font-size:12px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
 /* Toolbar: single line; scrolls horizontally if too tight (no overlap) */
@@ -78,7 +79,12 @@ html[dir="rtl"] .field--date{ margin-left:0; margin-right:auto; }
 /* Canvas/footer */
 canvas{ width:100%; height:auto; background:#fff; border-radius:12px; display:block; }
 .footer-ribbon{ width:100%; display:block; margin-top:18px; border-radius:10px; }
-
+.radio {
+  display: flex;
+  flex-direction: column;   /* vertical */
+  align-items: flex-start;  /* left-align labels (right in RTL automatically) */
+  gap: 4px;                 /* space between rows */
+}
 /* RTL minor tweaks */
 html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 </style>
@@ -90,8 +96,8 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 
   const firebaseConfig = {
     apiKey: "AIzaSyCrm86rYfHXbe2gpzDbvkl2wEWnzcDqi28",
-    authDomain: "covidest.firebaseapp.com",
-    projectId: "covidest",
+    authDomain: "arielisr.github.io",
+    projectId: "vitamin-d-normogram",
     storageBucket: "covidest.appspot.com",
     messagingSenderId: "1028167923136",
     appId: "1:1028167923136:web:1ca1fc0177ebd0d3b70425",
@@ -163,7 +169,7 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
         <div class="hint" id="unitHint">= 50.0 nmol/L</div>
       </div>
 
-      <div class="field field--date">
+      <div class="field">
         <label id="lblDate">Date of measurement</label>
         <input id="measureDate" type="date">
         <div class="hint" id="hintDate">Anchors the seasonal curve</div>
