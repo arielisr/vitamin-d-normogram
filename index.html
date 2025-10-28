@@ -7,7 +7,7 @@
 <style>
 :root{
   --bg:#ffffff; --card:#fff; --ink:#1f2937; --muted:#6b7280;
-  --fieldw: 10ch;           /* compact inputs */
+  --fieldw: 8ch;           /* compact inputs */
   --coefw: 110px;           /* coefficient field width */
   --wrapw: 1100px;          /* page width */
 }
@@ -46,7 +46,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
   width:var(--fieldw); max-width:100%; font-size:16px; padding:6px 8px;
   border:1px solid #e5e7eb; border-radius:10px; font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
 }
-.field input[type="date"]{ width:120px; }
+.field input[type="date"]{ width:112px; }
 .hint{ color:var(--muted); font-size:12px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
 /* Toolbar: single line; scrolls horizontally if too tight (no overlap) */
@@ -91,7 +91,6 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 @media (max-width: 680px) {
   canvas { min-height: 220px; }
 }
-#bandsHint { display: none !important; }
 </style>
 </head>
 <script type="module">
@@ -177,7 +176,7 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
       <div class="field">
         <label id="lblDate">Date of measurement</label>
         <input id="measureDate" type="date">
-        <div class="hint" id="hintDate">Anchors the seasonal curve</div>
+        <div class="hint" id="hintDate" hidden>Anchors the seasonal curve</div>
       </div>
     </div>
 
@@ -498,7 +497,8 @@ function draw(){
     }
   }
 
-
+	const el = document.getElementById('bandsHint');
+	if (el) el.hidden = !isSmall; 
   // month labels (localized)
   const yearForLabels = (new Date()).getFullYear();
   ctx.textAlign='center'; ctx.textBaseline='top';
