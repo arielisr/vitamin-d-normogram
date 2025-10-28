@@ -31,7 +31,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 }
 @media (max-width:480px){
   .banner-title{
-    font-size:clamp(12px,3vw,20px); /* lower max on small screens */
+    font-size:clamp(14px,4vw,20px); /* lower max on small screens */
     line-height:1.1;                /* tighten lines a bit */
     padding:4px 8px;                /* trim padding */
     max-width:92vw;                 /* avoid long wraps */
@@ -246,8 +246,8 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 
 		<div class="vd-body">
 		  <div class="vd-value"><span id="vd-live">25</span> <span id="vd-unit-label">ng/mL</span></div>
-		  <input id="vitd-slider" type="range" min="0" max="70" step="1" value="25" list="vd-ticks">
-		  <datalist id="vd-ticks"></datalist>
+		  <input id="vitd-slider" type="range" dir="ltr" min="0" max="70" step="1" value="25" list="vd-ticks">
+		  <datalist id="vd-ticks" dir="ltr"></datalist>
 		  <div class="vd-actions">
 			<button type="button" id="vd-dec">-</button>
 			<button type="button" id="vd-inc">+</button>
