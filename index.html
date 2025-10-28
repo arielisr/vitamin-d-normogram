@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Vitamin D Calendar Adjustment</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
 :root{
   --bg:#ffffff; --card:#fff; --ink:#1f2937; --muted:#6b7280;
@@ -23,7 +23,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 .banner-wrap{ position:relative; }
 .hero{ width:100%; height:auto; display:block; border-radius:10px; }
 .banner-title{
-  position:absolute; left:50%; top:42%; transform:translate(-50%,-50%);
+  position:absolute; left:50%; top:30%; transform:translate(-50%,-50%);
   color:#fff; font-weight:700; text-align:center; line-height:1.15;
   text-shadow:0 2px 8px rgba(0,0,0,.45);
   font-size:clamp(20px,3vw,40px);
@@ -31,7 +31,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 }
 @media (max-width:480px){
   .banner-title{
-    font-size:clamp(14px,2vw,20px); /* lower max on small screens */
+    font-size:clamp(16px,6vw,24px); /* lower max on small screens */
     line-height:1.1;                /* tighten lines a bit */
     padding:4px 8px;                /* trim padding */
     max-width:92vw;                 /* avoid long wraps */
@@ -128,11 +128,35 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 }
 .vd-primary { background:#111; color:#fff; border-color:#111; }
 
-@media (max-width: 680px) {
-  canvas { min-height: 220px; }
+@media (max-width: 640px){
+  html, body { margin:0; padding:0; }
+
+  /* Kill container gutters and width caps */
+  .wrap, .container, .section {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Respect iOS notches when you DO want tiny side gutters */
+  .wrap, .container, .section, header, footer {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Optional: make specific blocks bleed full width */
+  .fullbleed {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
+
+  /* If your banner had inner padding, trim it */
+  .banner, .banner-title { padding-left: 0; padding-right: 0; }
 }
 </style>
 </head>
+<script>window.process = window.process || { env: {} };</script>
 <script type="module">
   import { initializeApp }     from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
   import { getAnalytics, isSupported, logEvent, setUserProperties }
@@ -213,29 +237,25 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
         <div class="hint" id="unitHint">= 50.0 nmol/L</div>
       </div>
 <!-- Modal slider -->
-<div id="vitd-modal" class="vd-modal" aria-hidden="true" role="dialog" aria-labelledby="vd-title">
-  <div class="vd-dialog">
-    <div class="vd-header">
-      <div id="vd-title">Set Vitamin D</div>
-      <button type="button" class="vd-close" aria-label="Close">×</button>
-    </div>
+	<div id="vitd-modal" class="vd-modal" aria-hidden="true" role="dialog" aria-labelledby="vd-title">
+	  <div class="vd-dialog">
+		<div class="vd-header">
+		  <div id="vd-title">Set Vitamin D</div>
+		  <button type="button" class="vd-close" aria-label="Close">X</button>
+		</div>
 
-    <div class="vd-body">
-      <div class="vd-value"><span id="vd-live">25</span></div>
-      <input id="vitd-slider" type="range" min="0" max="70" step="1" value="25" list="vd-ticks">
-      <datalist id="vd-ticks">
-        <option value="0"></option><option value="10"></option><option value="20"></option>
-        <option value="30"></option><option value="40"></option><option value="50"></option>
-        <option value="60"></option><option value="70"></option>
-      </datalist>
-      <div class="vd-actions">
-        <button type="button" id="vd-dec">-</button>
-        <button type="button" id="vd-inc">+</button>
-        <button type="button" id="vd-ok"  class="vd-primary">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+		<div class="vd-body">
+		  <div class="vd-value"><span id="vd-live">25</span> <span id="vd-unit-label">ng/mL</span></div>
+		  <input id="vitd-slider" type="range" min="0" max="70" step="1" value="25" list="vd-ticks">
+		  <datalist id="vd-ticks"></datalist>
+		  <div class="vd-actions">
+			<button type="button" id="vd-dec">-</button>
+			<button type="button" id="vd-inc">+</button>
+			<button type="button" id="vd-ok" class="vd-primary">OK</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
       <div class="field">
         <label id="lblDate">Date of measurement</label>
         <input id="measureDate" type="date">
@@ -630,10 +650,10 @@ function draw(){
   ctx.fillStyle='#111';
   ctx.textAlign='center';
   ctx.textBaseline='bottom';
-  ctx.fillText(STR[LANG].axisX, (x0 + x1) / 2, H - 6);
 
   // remove the left y-axis legend on small screens
   if (!isSmall) {
+    ctx.fillText(STR[LANG].axisX, (x0 + x1) / 2, H - 6);
     ctx.translate(rtl ? W-16 : 16, (y0 + y1) / 2);
     ctx.rotate(rtl ? Math.PI/2 : -Math.PI / 2);
     ctx.fillText(STR[LANG].axisY, 0, 0);
@@ -686,108 +706,168 @@ document.getElementById('langSel')?.addEventListener('change', sizeCanvasForView
 document.getElementById('unitGroup')?.addEventListener('change', sizeCanvasForViewport);
 
 (function(){
-  const input  = document.getElementById('vitd');
+  const input   = document.getElementById('vitd');
+
   const modal  = document.getElementById('vitd-modal');
   const dialog = modal.querySelector('.vd-dialog');
   const slider = document.getElementById('vitd-slider');
+  const ticks  = document.getElementById('vd-ticks');
   const live   = document.getElementById('vd-live');
+  const unitLb = document.getElementById('vd-unit-label');
+
   const btnOk  = document.getElementById('vd-ok');
   const btnX   = modal.querySelector('.vd-close');
   const decBtn = document.getElementById('vd-dec');
   const incBtn = document.getElementById('vd-inc');
 
-  // Phone gate: small viewport + coarse pointer (touch)
+  // Helpers for unit radio group
+  const getUnit = () =>
+    document.querySelector('input[name="unit"]:checked')?.value || 'ng';
+
+  const onUnitChange = (fn) => {
+    // one listener on the container to catch any radio change
+    document.getElementById('unitGroup')?.addEventListener('change', fn);
+  };
+
+  // Phone gate: only open modal on phones
   const mq = window.matchMedia('(max-width: 640px) and (pointer: coarse)');
   const isPhone = () => mq.matches;
 
-  const MIN = Number(input.min) || 0;
-  const MAX = Number(input.max) || 70;
-  const STEP = input.step === 'any' ? 1 : Number(input.step) || 1;
+  const getMaxByUnit = () => (getUnit() === 'nmol' ? 170 : 70);
+  const getStep = () => (input.step === 'any' ? 1 : Number(input.step) || 1);
 
   let isOpen = false;
-  const clamp = v => Math.min(MAX, Math.max(MIN, v));
+
+  const clamp = (v, maxV) => Math.min(maxV, Math.max(0, v));
+
+  function buildTicks(maxV){
+    // build ticks every 10 up to maxV (cap count)
+    const step = maxV <= 70 ? 10 : 20; // fewer labels for long range
+    const parts = [];
+    for (let v = 0; v <= maxV; v += step) {
+      parts.push('<option value="' + v + '"></option>');
+    }
+    // ensure exact max tick
+    if (parts.length === 0 || !parts[parts.length - 1].includes('value="' + maxV + '"')) {
+      parts.push('<option value="' + maxV + '"></option>');
+    }
+    ticks.innerHTML = parts.join('');
+  }
+
+    // Keep slider + number input limits in sync with the selected unit
+  function syncSliderToUnit(){
+    const unit = getUnit();
+    const maxV = getMaxByUnit();
+    slider.max = String(maxV);
+    input.max  = String(maxV);
+    buildTicks(maxV);
+    unitLb.textContent = unit === 'nmol' ? 'nmol/L' : 'ng/mL';
+    // clamp and mirror value
+    const v = clamp(+input.value || 0, maxV);
+    input.value = v;
+    slider.value = v;
+    live.textContent = slider.value;
+  }
+
+  // When the radio changes, update limits and, if the modal is closed, apply immediately
+  onUnitChange(() => {
+    syncSliderToUnit();
+    if (!isOpen) applyToInput(); // updates the number field and triggers your draw()
+    updateUnitHint();            // refreshes the "= xx nmol" hint
+    sizeCanvasForViewport();     // if layout depends on labels width
+  });
+
+  // Also guard manual typing in the number input against the current max
+  input.addEventListener('input', () => {
+    const maxV = getMaxByUnit();
+    if (+input.value > maxV) input.value = String(maxV);
+  });
 
   function openModal() {
     if (isOpen) return;
     isOpen = true;
-    slider.value = clamp(+input.value || 0);
-    live.textContent = slider.value;
+    syncSliderToUnit();
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     slider.focus({preventScroll:true});
   }
 
-  function closeModal(apply) {
+  function applyToInput(){
+    const maxV = getMaxByUnit();
+    const v = clamp(+slider.value || 0, maxV);
+    input.value = v;
+    input.dispatchEvent(new Event('input',  {bubbles:true}));
+    input.dispatchEvent(new Event('change', {bubbles:true}));
+  }
+
+  function closeModal(apply){
     if (!isOpen) return;
-    if (apply) {
-      input.value = clamp(+slider.value);
-      input.dispatchEvent(new Event('input',  {bubbles:true}));
-      input.dispatchEvent(new Event('change', {bubbles:true}));
-    }
+    if (apply) applyToInput();
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     isOpen = false;
-    input.blur(); // avoid re-opening
+    input.blur();
   }
 
-  // Open modal only on phones; desktop keeps default behavior
+  // Open on click only on phones
   input.addEventListener('click', (e) => {
-    if (!isPhone()) return;           // desktop/tablet: do nothing special
-    e.preventDefault();               // stop native keyboard popping first
+    if (!isPhone()) return;
+    e.preventDefault();
     openModal();
   });
 
-  // If the device stops matching (rotate/rescale), auto-close
-  mq.addEventListener('change', () => {
-    if (!isPhone() && isOpen) closeModal(false);
+  // Update live readout
+  slider.addEventListener('input', () => {
+    live.textContent = slider.value;
   });
 
-  // Live readout
-  slider.addEventListener('input', () => { live.textContent = slider.value; });
-
-  // +/- steppers
+  // +/- buttons
   incBtn.addEventListener('click', () => {
-    slider.value = clamp(+slider.value + STEP);
+    const maxV = getMaxByUnit();
+    const step = getStep();
+    slider.value = clamp(+slider.value + step, maxV);
     slider.dispatchEvent(new Event('input', {bubbles:true}));
   });
   decBtn.addEventListener('click', () => {
-    slider.value = clamp(+slider.value - STEP);
+    const maxV = getMaxByUnit();
+    const step = getStep();
+    slider.value = clamp(+slider.value - step, maxV);
     slider.dispatchEvent(new Event('input', {bubbles:true}));
   });
 
-  // Apply / close buttons
+  // Apply on OK and on X (as requested)
   btnOk.addEventListener('click', () => closeModal(true));
-  btnX.addEventListener('click', () => closeModal(false));
+  btnX.addEventListener('click',  () => closeModal(true));
 
-  // Backdrop click: close if outside dialog
+  // Backdrop click cancels
   modal.addEventListener('click', (e) => {
     if (!dialog.contains(e.target)) closeModal(false);
   });
 
-  // Keyboard while open
-  document.addEventListener('keydown', (e) => {
-    if (!isOpen) return;
-    if (e.key === 'Escape') closeModal(false);
-    if (e.key === 'Enter')  closeModal(true);
+  // If device stops matching, auto-close
+  mq.addEventListener('change', () => {
+    if (!isPhone() && isOpen) closeModal(false);
   });
 })();
 
-
 // init
 (function init(){
-  // default date = today
-  const today = new Date();
-  const iso = today.toISOString().slice(0,10);
-  document.getElementById('measureDate').value = iso;
+  // default date = today (local)
+  const dateEl = document.getElementById('measureDate');
+  if (dateEl) {
+    // valueAsDate respects local time and avoids timezone off-by-one
+    dateEl.valueAsDate = new Date();
+  }
 
   // set initial language (browser or ?lang=)
   document.getElementById('langSel').value = LANG;
   applyLang(LANG);
 
-  // responsive redraw
   new ResizeObserver(draw).observe(document.getElementById('plot'));
-  sizeCanvasForViewport()
+  sizeCanvasForViewport();
 })();
+
+
 </script>
 </body>
 </html>
