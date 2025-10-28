@@ -127,15 +127,19 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 
 /* Modal shell */
 .vd-modal {
-  position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+  position: fixed; inset: 0; display: none; /* no flex-centering; JS will pin to VV */
   background: rgba(0,0,0,.4); z-index: 9999;
 }
 .vd-modal[aria-hidden="false"] { display: flex; }
-
-/* Dialog card */
 .vd-dialog {
-  width: min(92vw, 420px); background: #fff; color:#111; border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25); overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  position: fixed;           /* pin to visual viewport via JS */
+  left: 50vw; top: 50vh;     /* fallback center if VV not supported */
+  transform: translate(-50%,-50%);
+  width: min(92vw, 420px);
+  background: #fff; color:#111; border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25); overflow: hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  will-change: transform, top, left;
 }
 .vd-header {
   display:flex; align-items:center; justify-content:space-between;
@@ -708,12 +712,19 @@ window.addEventListener('orientationchange', () => {
   if (aboveCanvas) ro.observe(aboveCanvas);
 });
 
+function isSmallViewport(){
+   // small phones in portrait (narrow width) OR phones in landscape (short height)
+   return (
+     window.matchMedia('(max-width: 560px)').matches ||
+     window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches
+   );
+}
 function draw(){
   const S = STR[LANG];
   deviceScale(cv, ctx);
   const W = cv.clientWidth, H = cv.clientHeight;
   const rtl = (LANG === 'he');
-  const isSmall = window.matchMedia('(max-width: 500px)').matches;
+  const isSmall = isSmallViewport();
   const m = isSmall ? {l:36, r:16, t:28, b:40} : {l:56, r:140, t:34, b:46};
   const x0 = m.l, x1 = W - m.r, y0 = m.t, y1 = H - m.b;
   const plotW = x1 - x0, plotH = y1 - y0;
