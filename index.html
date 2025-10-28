@@ -60,28 +60,42 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 .field input[type="date"]{ width:112px; }
 .hint{ color:var(--muted); font-size:12px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
-/* Toolbar: single line; scrolls horizontally if too tight (no overlap) */
-.toolbar.one-line{
-  display:flex; align-items:flex-end; gap:12px;
-  flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+/* Center the input fields horizontally */
+.toolbar.one-line {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: nowrap;
+  justify-content: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Keep children from shrinking into each other */
-.toolbar.one-line > .field{ flex:0 0 auto; min-width:0; }
-
-/* Lock the value + radios together on ONE line as a single chunk */
-.field-row{
-  display:inline-grid;
-  grid-auto-flow:column;
-  grid-auto-columns:max-content;
-  align-items:end;
-  gap:8px;
-  white-space:nowrap;   /* absolutely no internal wrapping */
+/* Let children shrink sensibly */
+.toolbar.one-line > .field {
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
-/* Radios inline, no wrap */
-.radio{ display:inline-flex; gap:10px; flex-wrap:nowrap; }
-.radio label{ white-space:nowrap; display:flex; align-items:center; gap:6px; }
+/* Stop pushing the date to the edge; center with the rest */
+.field--date { 
+  margin-left: 0 !important; 
+  margin-right: 0 !important;
+}
+
+/* Keep value+units locked on one line */
+.field-row {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* Radios inline and non-wrapping */
+.field-row .radio { display:flex; flex-direction:row; gap:10px; flex-wrap:nowrap; }
+.field-row .radio label { white-space:nowrap; }
 
 /* Push the date block to the far right and prevent it from shrinking over radios */
 .field--date{ margin-left:auto; flex:0 0 auto; white-space:nowrap; }
@@ -153,6 +167,20 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 
   /* If your banner had inner padding, trim it */
   .banner, .banner-title { padding-left: 0; padding-right: 0; }
+  
+  .footer-ribbon {
+    /* break out of the .wrap horizontal padding */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+
+    /* optional: tweak look on edge-to-edge */
+    border-radius: 0;          /* remove rounded corners at the edges */
+    display: block;
+  }
 }
 </style>
 </head>
