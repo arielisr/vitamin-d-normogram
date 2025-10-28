@@ -99,15 +99,23 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
   grid-auto-columns:max-content;
   align-items:end;
   gap:8px;
-  white-space:nowrap;   /* absolutely no internal wrapping */
+  white-space:nowrap;  
+}
+.field--date{
+  margin-inline-start: 10px;
 }
 
+/* mirror for RTL */
+html[dir="rtl"] .field--date{
+  margin-inline-start: 0;
+  margin-inline-end: 10px;
+}
 /* Radios inline, no wrap */
 .radio {
   display: inline-flex;
-  flex-direction: column;   /* vertical */
-  align-items: flex-start;  /* left-align labels (right in RTL automatically) */
-  gap: 2px;                 /* space between rows */
+  flex-direction: column;
+  align-items: flex-start; 
+  gap: 2px;
 }
 .radio label{ white-space:nowrap; display:flex; align-items:center; }
 
@@ -145,6 +153,62 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
   padding:10px 14px; border-radius:10px; border:1px solid #e5e7eb; background:#fff; font-size:16px;
 }
 .vd-primary { background:#111; color:#fff; border-color:#111; }
+/* value row: keep input+radios on one line */
+.value-row{
+  display:flex;
+  align-items:flex-end;   /* bottom-align input with radios */
+  gap:0px;
+  flex-wrap:nowrap;       /* do not wrap when there is room */
+}
+
+/* the small column that holds the label + input (+ hint) */
+.input-col{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  min-width:0;
+}
+
+/* reuse your compact input width */
+.input-col input[type="number"]{
+  width:var(--fieldw);
+}
+
+/* radios slightly aside but same line */
+.value-row .radio{
+  display:flex;
+  flex-direction:column;  /* your vertical arrangement */
+  gap:2px;
+  margin-inline-start:8px;  /* a bit of breathing room from the input */
+}
+
+/* tighten the label above the input only */
+.input-col > label{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+/* keep hint under the input and prevent it from stretching layout */
+.input-col .hint{
+  margin-top:4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:22ch;
+}
+
+/* RTL support inherits naturally; if you want mirrored spacing: */
+html[dir="rtl"] .value-row .radio{
+  margin-inline-start:0;
+  margin-inline-end:8px;
+}
+
+/* On very narrow screens allow wrap, but keep input+label together */
+@media (max-width:520px){
+  .value-row{ flex-wrap:wrap; }
+  .value-row .radio{ order:2; }     /* radios drop under if needed */
+}
 
 @media (max-width: 640px){
   html, body { margin:0; padding:0; }
@@ -243,17 +307,20 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 
   <div class="wrap">
     <div class="toolbar one-line">
-      <div class="field">
-        <label id="lblValue">25(OH)D value</label>
-        <div class="field-row">
-			<input id="vitd" type="number" min="0" max="70" step="1" value="25" inputmode="decimal">
-          <div class="radio" id="unitGroup">
-            <label><input type="radio" name="unit" value="ng" checked> <span id="unitNg">ng/mL</span></label>
-            <label><input type="radio" name="unit" value="nmol"> <span id="unitNmol">nmol/L</span></label>
-          </div>
-        </div>
-        <div class="hint" id="unitHint">= 50.0 nmol/L</div>
-      </div>
+<div class="field field--value">
+  <div class="value-row">
+    <div class="input-col">
+      <label id="lblValue">25(OH)D value</label>
+      <input id="vitd" type="number" min="0" max="70" step="1" value="25" inputmode="decimal">
+      <div class="hint" id="unitHint">= 50.0 nmol/L</div>
+    </div>
+
+    <div class="radio" id="unitGroup">
+      <label><input type="radio" name="unit" value="ng" checked> <span id="unitNg">ng/mL</span></label>
+      <label><input type="radio" name="unit" value="nmol"> <span id="unitNmol">nmol/L</span></label>
+    </div>
+  </div>
+</div>
 <!-- Modal slider -->
 	<div id="vitd-modal" class="vd-modal" aria-hidden="true" role="dialog" aria-labelledby="vd-title">
 	  <div class="vd-dialog">
@@ -274,11 +341,11 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 		</div>
 	  </div>
 	</div>
-      <div class="field">
-        <label id="lblDate">Date of measurement</label>
-        <input id="measureDate" type="date">
-        <div class="hint" id="hintDate">Anchors the seasonal curve</div>
-      </div>
+<div class="field field--date">
+  <label id="lblDate">Date of measurement</label>
+  <input id="measureDate" type="date">
+  <div class="hint" id="hintDate">Anchors the seasonal curve</div>
+</div>
     </div>
 
       <details hidden>
@@ -507,16 +574,13 @@ cv.addEventListener('click', (e) => {
 
 const ctx = cv.getContext('2d');
 
-const PHONE_BP = 680; // px
+const PHONE_BP = 640; // px
 
 function sizeCanvasForViewport() {
-  const PHONE_BP = 680;
-  const isSmall = window.matchMedia(`(max-width:${PHONE_BP}px)`).matches;
-
   const rect = cv.getBoundingClientRect();
   const keyboardInset = window.visualViewport ? (window.visualViewport.height - window.innerHeight) : 0;
-  const remaining = Math.max(0, window.innerHeight - rect.top - 12 - keyboardInset);
-  const targetH = Math.max(window.innerHeight *0.6, Math.round(remaining * 0.5)); // ~50% of remainder
+  const remaining = Math.max(0, window.innerHeight - rect.top - 20 - keyboardInset);
+  const targetH = Math.max(window.innerHeight * 0.6, Math.round(remaining * 0.5)); // ~50% of remainder
   cv.style.height = `${targetH}px`;
   draw();
 }
