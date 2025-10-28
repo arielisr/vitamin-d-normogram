@@ -99,8 +99,34 @@ canvas{ width:100%; height:auto; background:#fff; border-radius:12px; display:bl
 /* RTL minor tweaks */
 html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 
-#vitd { width: 7ch; text-align: center; }
-#vitd-slider { width: 220px; vertical-align: middle; }  const num = document.getElementById('vitd');
+/* Modal shell */
+.vd-modal {
+  position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.4); z-index: 9999;
+}
+.vd-modal[aria-hidden="false"] { display: flex; }
+
+/* Dialog card */
+.vd-dialog {
+  width: min(92vw, 420px); background: #fff; color:#111; border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25); overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+.vd-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 14px; background:#f6f7fb; border-bottom:1px solid #e5e7eb;
+  font-weight:600;
+}
+.vd-close { background:none; border:0; font-size:20px; line-height:1; padding:6px; cursor:pointer; }
+.vd-body { padding: 16px; }
+.vd-value { text-align:center; font-size: 22px; margin-bottom: 10px; }
+#vitd-slider { width: 100%; }
+.vd-actions {
+  display:flex; gap:8px; justify-content:center; margin-top:14px;
+}
+.vd-actions button {
+  padding:10px 14px; border-radius:10px; border:1px solid #e5e7eb; background:#fff; font-size:16px;
+}
+.vd-primary { background:#111; color:#fff; border-color:#111; }
 
 @media (max-width: 680px) {
   canvas { min-height: 220px; }
@@ -141,7 +167,7 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
   log('page_view', { page_title: document.title });
 
   // Example: log interactions (hook into your existing inputs)
-  const vitInput = document.getElementById('vitdVal');
+  const vitInput = document.getElementById('vitd');
   const dateInput = document.getElementById('measureDate');
   const unitRadios = document.querySelectorAll('input[name="unit"]');
 
@@ -178,9 +204,7 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
       <div class="field">
         <label id="lblValue">25(OH)D value</label>
         <div class="field-row">
-<label for="vitd">Vitamin D</label>
-<input id="vitdVal" type="number" min="0" max="70" step="1" value="25" inputmode="decimal">
-
+			<input id="vitd" type="number" min="0" max="70" step="1" value="25" inputmode="decimal">
           <div class="radio" id="unitGroup">
             <label><input type="radio" name="unit" value="ng" checked> <span id="unitNg">ng/mL</span></label>
             <label><input type="radio" name="unit" value="nmol"> <span id="unitNmol">nmol/L</span></label>
@@ -188,7 +212,30 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
         </div>
         <div class="hint" id="unitHint">= 50.0 nmol/L</div>
       </div>
+<!-- Modal slider -->
+<div id="vitd-modal" class="vd-modal" aria-hidden="true" role="dialog" aria-labelledby="vd-title">
+  <div class="vd-dialog">
+    <div class="vd-header">
+      <div id="vd-title">Set Vitamin D</div>
+      <button type="button" class="vd-close" aria-label="Close">×</button>
+    </div>
 
+    <div class="vd-body">
+      <div class="vd-value"><span id="vd-live">25</span></div>
+      <input id="vitd-slider" type="range" min="0" max="70" step="1" value="25" list="vd-ticks">
+      <datalist id="vd-ticks">
+        <option value="0"></option><option value="10"></option><option value="20"></option>
+        <option value="30"></option><option value="40"></option><option value="50"></option>
+        <option value="60"></option><option value="70"></option>
+      </datalist>
+      <div class="vd-actions">
+        <button type="button" id="vd-dec">-</button>
+        <button type="button" id="vd-inc">+</button>
+        <button type="button" id="vd-ok"  class="vd-primary">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
       <div class="field">
         <label id="lblDate">Date of measurement</label>
         <input id="measureDate" type="date">
@@ -398,7 +445,7 @@ function draw(){
 
   // inputs
   const unitSel = document.querySelector('input[name="unit"]:checked').value;
-  const v_in = parseFloat(document.getElementById('vitdVal').value || "0");
+  const v_in = parseFloat(document.getElementById('vitd').value || "0");
   const v_ng = (unitSel === 'ng') ? v_in : toNg(v_in); // ALWAYS compute in ng/mL
 
   const dateStr = document.getElementById('measureDate').value;
@@ -609,7 +656,7 @@ function draw(){
 /* ---------- UI wiring ---------- */
 function updateUnitHint(){
   const unit = document.querySelector('input[name="unit"]:checked').value;
-  let v_in = parseFloat(document.getElementById('vitdVal').value || "0");
+  let v_in = parseFloat(document.getElementById('vitd').value || "0");
   const hint = document.getElementById('unitHint');
   if (unit==='ng') hint.textContent = `= ${(v_in*2.5).toFixed(1)} ${STR[LANG].unitNmol}`;
   else hint.textContent = `= ${(toNg(v_in)).toFixed(1)} ${STR[LANG].unitNg}`;
@@ -621,7 +668,7 @@ document.getElementById('langSel').addEventListener('change', (e)=>{
 });
 
 // live reactive inputs
-['vitdVal','p_const','p_sin1','p_cos1','p_sin2','p_cos2'].forEach(id=>{
+['vitd','p_const','p_sin1','p_cos1','p_sin2','p_cos2'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{ updateUnitHint(); draw(); });
 });
 document.querySelectorAll('input[name="unit"]').forEach(r => r.addEventListener('change', ()=>{ updateUnitHint(); draw(); }));
@@ -638,14 +685,93 @@ ro.observe(document.documentElement); // or observe the wrap/card above the canv
 document.getElementById('langSel')?.addEventListener('change', sizeCanvasForViewport);
 document.getElementById('unitGroup')?.addEventListener('change', sizeCanvasForViewport);
 
-document.getElementById('vitd').addEventListener('input', e => {
-  const el = e.currentTarget;
-  const v = +el.value;
-  if (!Number.isNaN(v)) {
-    if (v > 70) el.value = 70;
-    if (v < 0)  el.value = 0;
+(function(){
+  const input  = document.getElementById('vitd');
+  const modal  = document.getElementById('vitd-modal');
+  const dialog = modal.querySelector('.vd-dialog');
+  const slider = document.getElementById('vitd-slider');
+  const live   = document.getElementById('vd-live');
+  const btnOk  = document.getElementById('vd-ok');
+  const btnX   = modal.querySelector('.vd-close');
+  const decBtn = document.getElementById('vd-dec');
+  const incBtn = document.getElementById('vd-inc');
+
+  // Phone gate: small viewport + coarse pointer (touch)
+  const mq = window.matchMedia('(max-width: 640px) and (pointer: coarse)');
+  const isPhone = () => mq.matches;
+
+  const MIN = Number(input.min) || 0;
+  const MAX = Number(input.max) || 70;
+  const STEP = input.step === 'any' ? 1 : Number(input.step) || 1;
+
+  let isOpen = false;
+  const clamp = v => Math.min(MAX, Math.max(MIN, v));
+
+  function openModal() {
+    if (isOpen) return;
+    isOpen = true;
+    slider.value = clamp(+input.value || 0);
+    live.textContent = slider.value;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    slider.focus({preventScroll:true});
   }
-});
+
+  function closeModal(apply) {
+    if (!isOpen) return;
+    if (apply) {
+      input.value = clamp(+slider.value);
+      input.dispatchEvent(new Event('input',  {bubbles:true}));
+      input.dispatchEvent(new Event('change', {bubbles:true}));
+    }
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    isOpen = false;
+    input.blur(); // avoid re-opening
+  }
+
+  // Open modal only on phones; desktop keeps default behavior
+  input.addEventListener('click', (e) => {
+    if (!isPhone()) return;           // desktop/tablet: do nothing special
+    e.preventDefault();               // stop native keyboard popping first
+    openModal();
+  });
+
+  // If the device stops matching (rotate/rescale), auto-close
+  mq.addEventListener('change', () => {
+    if (!isPhone() && isOpen) closeModal(false);
+  });
+
+  // Live readout
+  slider.addEventListener('input', () => { live.textContent = slider.value; });
+
+  // +/- steppers
+  incBtn.addEventListener('click', () => {
+    slider.value = clamp(+slider.value + STEP);
+    slider.dispatchEvent(new Event('input', {bubbles:true}));
+  });
+  decBtn.addEventListener('click', () => {
+    slider.value = clamp(+slider.value - STEP);
+    slider.dispatchEvent(new Event('input', {bubbles:true}));
+  });
+
+  // Apply / close buttons
+  btnOk.addEventListener('click', () => closeModal(true));
+  btnX.addEventListener('click', () => closeModal(false));
+
+  // Backdrop click: close if outside dialog
+  modal.addEventListener('click', (e) => {
+    if (!dialog.contains(e.target)) closeModal(false);
+  });
+
+  // Keyboard while open
+  document.addEventListener('keydown', (e) => {
+    if (!isOpen) return;
+    if (e.key === 'Escape') closeModal(false);
+    if (e.key === 'Enter')  closeModal(true);
+  });
+})();
+
 
 // init
 (function init(){
