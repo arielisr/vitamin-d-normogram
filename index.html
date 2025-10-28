@@ -7,7 +7,7 @@
 <style>
 :root{
   --bg:#ffffff; --card:#fff; --ink:#1f2937; --muted:#6b7280;
-  --fieldw: 8ch;           /* compact inputs */
+  --fieldw: 5ch;           /* compact inputs */
   --coefw: 110px;           /* coefficient field width */
   --wrapw: 1100px;          /* page width */
 }
@@ -31,7 +31,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 }
 @media (max-width:480px){
   .banner-title{
-    font-size:clamp(16px,2vw,24px); /* lower max on small screens */
+    font-size:clamp(16px,6vw,24px); /* lower max on small screens */
     line-height:1.1;                /* tighten lines a bit */
     padding:4px 8px;                /* trim padding */
     max-width:92vw;                 /* avoid long wraps */
@@ -98,6 +98,9 @@ canvas{ width:100%; height:auto; background:#fff; border-radius:12px; display:bl
 }
 /* RTL minor tweaks */
 html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
+
+#vitd { width: 7ch; text-align: center; }
+#vitd-slider { width: 220px; vertical-align: middle; }  const num = document.getElementById('vitd');
 
 @media (max-width: 680px) {
   canvas { min-height: 220px; }
@@ -175,7 +178,9 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
       <div class="field">
         <label id="lblValue">25(OH)D value</label>
         <div class="field-row">
-          <input id="vitdVal" type="number" value="20" step="0.1" min="0" inputmode="decimal">
+<label for="vitd">Vitamin D</label>
+<input id="vitdVal" type="number" min="0" max="70" step="1" value="25" inputmode="decimal">
+
           <div class="radio" id="unitGroup">
             <label><input type="radio" name="unit" value="ng" checked> <span id="unitNg">ng/mL</span></label>
             <label><input type="radio" name="unit" value="nmol"> <span id="unitNmol">nmol/L</span></label>
@@ -377,7 +382,7 @@ function draw(){
   const W = cv.clientWidth, H = cv.clientHeight;
 
   const rtl = (LANG === 'he');
-  const isSmall = window.matchMedia('(max-width: 480px)').matches;
+  const isSmall = window.matchMedia('(max-width: 500px)').matches;
 
   // margins:
   // - normal: extra outer margin for band labels (right in LTR, left in RTL)
@@ -633,6 +638,14 @@ ro.observe(document.documentElement); // or observe the wrap/card above the canv
 document.getElementById('langSel')?.addEventListener('change', sizeCanvasForViewport);
 document.getElementById('unitGroup')?.addEventListener('change', sizeCanvasForViewport);
 
+document.getElementById('vitd').addEventListener('input', e => {
+  const el = e.currentTarget;
+  const v = +el.value;
+  if (!Number.isNaN(v)) {
+    if (v > 70) el.value = 70;
+    if (v < 0)  el.value = 0;
+  }
+});
 
 // init
 (function init(){
