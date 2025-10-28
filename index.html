@@ -7,7 +7,7 @@
 <style>
 :root{
   --bg:#ffffff; --card:#fff; --ink:#1f2937; --muted:#6b7280;
-  --fieldw: 5ch;           /* compact inputs */
+  --fieldw: 6ch;           /* compact inputs */
   --coefw: 110px;           /* coefficient field width */
   --wrapw: 1100px;          /* page width */
 }
@@ -57,59 +57,41 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
   width:var(--fieldw); max-width:100%; font-size:16px; padding:6px 8px;
   border:1px solid #e5e7eb; border-radius:10px; font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
 }
-.field input[type="date"]{ width:112px; }
+.field input[type="date"]{ width:115px; }
 .hint{ color:var(--muted); font-size:12px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
-/* Center the input fields horizontally */
-.toolbar.one-line {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: nowrap;
-  justify-content: center;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+/* Toolbar: single line; scrolls horizontally if too tight (no overlap) */
+.toolbar.one-line{
+  display:flex; align-items:flex-end; gap:12px;
+  flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  justify-content: center; 
 }
 
-/* Let children shrink sensibly */
-.toolbar.one-line > .field {
-  flex: 0 1 auto;
-  min-width: 0;
+/* Keep children from shrinking into each other */
+.toolbar.one-line > .field{ flex:0 0 auto; min-width:0; }
+
+/* Lock the value + radios together on ONE line as a single chunk */
+.field-row{
+  display:inline-grid;
+  grid-auto-flow:column;
+  grid-auto-columns:max-content;
+  align-items:end;
+  gap:8px;
+  white-space:nowrap;   /* absolutely no internal wrapping */
 }
 
-/* Stop pushing the date to the edge; center with the rest */
-.field--date { 
-  margin-left: 0 !important; 
-  margin-right: 0 !important;
+/* Radios inline, no wrap */
+.radio {
+  display: inline-flex;
+  flex-direction: column;   /* vertical */
+  align-items: flex-start;  /* left-align labels (right in RTL automatically) */
+  gap: 2px;                 /* space between rows */
 }
-
-/* Keep value+units locked on one line */
-.field-row {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: end;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-/* Radios inline and non-wrapping */
-.field-row .radio { display:flex; flex-direction:row; gap:10px; flex-wrap:nowrap; }
-.field-row .radio label { white-space:nowrap; }
-
-/* Push the date block to the far right and prevent it from shrinking over radios */
-.field--date{ margin-left:auto; flex:0 0 auto; white-space:nowrap; }
-html[dir="rtl"] .field--date{ margin-left:0; margin-right:auto; }
+.radio label{ white-space:nowrap; display:flex; align-items:center; }
 
 /* Canvas/footer */
 canvas{ width:100%; height:auto; background:#fff; border-radius:12px; display:block; }
-.footer-ribbon{ width:100%; display:block; margin-top:18px; border-radius:10px; }
-.radio {
-  display: flex;
-  flex-direction: column;   /* vertical */
-  align-items: flex-start;  /* left-align labels (right in RTL automatically) */
-  gap: 4px;                 /* space between rows */
-}
+.footer-ribbon{ width:100%; display:block; margin-top:0px; border-radius:10px; }
 /* RTL minor tweaks */
 html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 
@@ -168,19 +150,6 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
   /* If your banner had inner padding, trim it */
   .banner, .banner-title { padding-left: 0; padding-right: 0; }
   
-  .footer-ribbon {
-    /* break out of the .wrap horizontal padding */
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    width: 100vw;
-
-    /* optional: tweak look on edge-to-edge */
-    border-radius: 0;          /* remove rounded corners at the edges */
-    display: block;
-  }
 }
 </style>
 </head>
@@ -251,7 +220,6 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
   </div>
 
   <div class="wrap">
-  <div class="card">
     <div class="toolbar one-line">
       <div class="field">
         <label id="lblValue">25(OH)D value</label>
@@ -304,6 +272,8 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
       </details>
       <canvas id="plot" width="1200" height="520"></canvas>
       <div class="hint" id="bandsHint">Bands: Very-severe &lt;5, Severe 5–10, Moderate 10–15, Mild 15–20, Insufficiency 20–30, Sufficiency ≥30 ng/mL</div>
+  </div>
+  <div class="wrap wrap--banner">
     <img class="footer-ribbon" alt="Leumit Research Institute ribbon" src="https://arielisr.github.io/lri-newsletter/graphics/leumit_tailer_300DPI.png">
   </div>
 
@@ -407,6 +377,33 @@ function applyLang(lang){
 }
 
 /* ---------- plotting utilities ---------- */
+function maxArr(arr, fallback = 0){
+  if (Array.isArray(arr) && arr.length) {
+    let m = arr[0];
+    for (let i=1; i<arr.length; i++) if (arr[i] > m) m = arr[i];
+    return m;
+  }
+  return fallback;
+}
+
+// Global plot mapping saved by draw()
+const plotState = {
+  x0: 0, x1: 0, y0: 0, y1: 0,
+  yMin: 0, yMax: 45
+};
+
+function clamp(v, a, b){ return Math.min(b, Math.max(a, v)); }
+
+// Convert DOY to yyyy-mm-dd string (local time) for current year
+function dateStrFromDoy(doy){
+  const year = new Date().getFullYear();
+  const d = new Date(year, 0, 1);
+  d.setDate(d.getDate() + (doy - 1));
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${year}-${mm}-${dd}`;
+}
+
 const toNmol = ng => ng * 2.5;
 const toNg   = nmol => nmol / 2.5;
 
@@ -441,87 +438,173 @@ function deviceScale(canvas, ctx){
   canvas.height = Math.round(rect.height * dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
-function clamp(v, lo, hi){ return Math.min(Math.max(v, lo), hi); }
 
 /* ---------- drawing ---------- */
 const cv = document.getElementById('plot');
+// REPLACE the whole listener with this:
+cv.addEventListener('click', (e) => {
+  const r  = cv.getBoundingClientRect();
+  const px = e.clientX - r.left;
+  const py = e.clientY - r.top;
+
+  const { x0, x1, y0, y1, yMin, yMax, daysMax = 365 } = plotState;
+  // ignore clicks outside the plot area
+  if (px < x0 || px > x1 || py < y0 || py > y1) return;
+
+  // map X to day-of-year (1..daysMax)
+  const day = Math.max(1, Math.min(
+    daysMax,
+    Math.round(1 + (px - x0) / (x1 - x0) * (daysMax - 1))
+  ));
+
+  // map Y pixel to value INDEPENDENT of the curve
+  const frac  = (y1 - py) / (y1 - y0);          // 0..1 bottom->top
+  const valNg = Math.min(yMax, Math.max(yMin, yMin + frac * (yMax - yMin)));
+
+  // update inputs (in the currently selected unit)
+  const unit      = document.querySelector('input[name="unit"]:checked')?.value || 'ng';
+  const vitInput  = document.getElementById('vitd');        // number field
+  const dateInput = document.getElementById('measureDate'); // date field
+
+  if (vitInput) {
+    const v = (unit === 'ng') ? valNg : (valNg * 2.5);
+    vitInput.value = Math.max(0, +v.toFixed(1));
+    vitInput.dispatchEvent(new Event('input',  { bubbles: true }));
+    vitInput.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  if (dateInput) {
+    dateInput.value = dateStrFromDoy(day);
+    dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // refresh the "= xx nmol" hint if you show it
+  if (typeof updateUnitHint === 'function') updateUnitHint();
+  // draw() will be called by the change handlers; call explicitly if needed:
+  if (typeof draw === 'function') draw();
+});
+
 const ctx = cv.getContext('2d');
 
 const PHONE_BP = 680; // px
 
 function sizeCanvasForViewport() {
+  const PHONE_BP = 680;
   const isSmall = window.matchMedia(`(max-width:${PHONE_BP}px)`).matches;
-  if (!isSmall) {
-    // desktop/tablet: let canvas be intrinsic; clear explicit height
-    cv.style.height = '';
-    draw();
-    return;
-  }
 
-  // Remaining viewport below the canvas top
   const rect = cv.getBoundingClientRect();
-  const safeBottom = 200 + (window.visualViewport ? (window.visualViewport.height - window.innerHeight) : 0);
-  const remaining = Math.max(0, window.innerHeight - rect.top - safeBottom);
-
-  // Target about 50% of the remaining height (with a floor)
-  const targetH = Math.max(400, Math.round(remaining * 0.4));
+  const keyboardInset = window.visualViewport ? (window.visualViewport.height - window.innerHeight) : 0;
+  const remaining = Math.max(0, window.innerHeight - rect.top - 12 - keyboardInset);
+  const targetH = Math.max(window.innerHeight *0.6, Math.round(remaining * 0.5)); // ~50% of remainder
   cv.style.height = `${targetH}px`;
-
-  // Redraw using the new clientHeight
   draw();
 }
+
+// call this instead of calling sizeCanvasForViewport() directly
+function relayoutCanvas() {
+  // 3 passes: now, next frame, and a short delay (for late assets)
+  sizeCanvasForViewport();
+  requestAnimationFrame(sizeCanvasForViewport);
+  setTimeout(sizeCanvasForViewport, 250);
+}
+
+// Run after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  relayoutCanvas();
+
+  // After all resources (images, CSS) load
+  window.addEventListener('load', relayoutCanvas);
+
+  // Fonts can cause reflow after they finish loading
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(relayoutCanvas).catch(()=>{});
+  }
+
+  // Banner image can shift layout: re-run when it finishes
+  const hero = document.querySelector('.hero');
+  if (hero) {
+    if (hero.complete) {
+      // already loaded
+      relayoutCanvas();
+    } else {
+      hero.addEventListener('load', relayoutCanvas, { once: true });
+      hero.addEventListener('error', relayoutCanvas, { once: true });
+    }
+  }
+
+  // Re-run on viewport changes (address bar show/hide on mobile)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', relayoutCanvas);
+    window.visualViewport.addEventListener('scroll', relayoutCanvas);
+  }
+
+  // Fallback: general window resizes
+  window.addEventListener('resize', relayoutCanvas);
+
+  // If your UI toggles language/units or changes text length, also hook them:
+  document.getElementById('langSel')?.addEventListener('change', relayoutCanvas);
+  document.getElementById('unitGroup')?.addEventListener('change', relayoutCanvas);
+
+  // Observe layout changes above the canvas (cards expanding, etc.)
+  const aboveCanvas = document.querySelector('.card'); // or a container above your canvas
+  const ro = new ResizeObserver(relayoutCanvas);
+  if (aboveCanvas) ro.observe(aboveCanvas);
+});
 
 function draw(){
   const S = STR[LANG];
   deviceScale(cv, ctx);
   const W = cv.clientWidth, H = cv.clientHeight;
-
   const rtl = (LANG === 'he');
   const isSmall = window.matchMedia('(max-width: 500px)').matches;
-
-  // margins:
-  // - normal: extra outer margin for band labels (right in LTR, left in RTL)
-  // - small: tighter margins; no band labels or y-axis legend
-  const m = isSmall
-    ? (rtl ? { l: 32, r: 16, t: 28, b: 40 } : { l: 36, r: 16, t: 28, b: 40 })
-    : (rtl ? { l: 140, r: 56, t: 34, b: 46 } : { l: 56,  r: 140, t: 34, b: 46 });
-
+  const m = isSmall ? {l:36, r:16, t:28, b:40} : {l:56, r:140, t:34, b:46};
   const x0 = m.l, x1 = W - m.r, y0 = m.t, y1 = H - m.b;
   const plotW = x1 - x0, plotH = y1 - y0;
 
-  ctx.clearRect(0,0,W,H);
-
-  // inputs
+  // --- inputs (unit, value, date, coefficients)
   const unitSel = document.querySelector('input[name="unit"]:checked').value;
-  const v_in = parseFloat(document.getElementById('vitd').value || "0");
-  const v_ng = (unitSel === 'ng') ? v_in : toNg(v_in); // ALWAYS compute in ng/mL
+  const v_in = parseFloat(document.getElementById('vitd').value || '0');
+  const v_ng = (unitSel === 'ng') ? v_in : toNg(v_in);   // always compute in ng/mL
 
   const dateStr = document.getElementById('measureDate').value;
   const d = dateStr ? new Date(dateStr) : new Date();
-  let doy = clamp(dayOfYear(d), 1, 365);
+  const doy = clamp(dayOfYear(d), 1, 365);
 
   const p = {
-    const: parseFloat(document.getElementById('p_const').value || "2.86504436"),
-    sin1:  parseFloat(document.getElementById('p_sin1').value  || "-0.19078822"),
-    cos1:  parseFloat(document.getElementById('p_cos1').value  || "-0.17079543"),
-    sin2:  parseFloat(document.getElementById('p_sin2').value  || "0.01443204"),
-    cos2:  parseFloat(document.getElementById('p_cos2').value  || "0.00978268")
+    const: parseFloat(document.getElementById('p_const').value || '2.86504436'),
+    sin1:  parseFloat(document.getElementById('p_sin1').value  || '-0.19078822'),
+    cos1:  parseFloat(document.getElementById('p_cos1').value  || '-0.17079543'),
+    sin2:  parseFloat(document.getElementById('p_sin2').value  || '0.01443204'),
+    cos2:  parseFloat(document.getElementById('p_cos2').value  || '0.00978268'),
   };
 
-  const days = Array.from({length:365}, (_,i)=>i+1);
-  const base = buildSeason(days, p);
-  const baseAt = base[doy-1];
-  const scale = (baseAt>0 ? v_ng / baseAt : 1);
-  const curve = base.map(z => z*scale);
+  // --- build base curve and scale it to pass through the input at the chosen date
+  const daysMax = 365;
+  const days = Array.from({length: daysMax}, (_, i) => i + 1);
+  const base = buildSeason(days, p);             // unscaled season (ng/mL)
+  const baseAt = base[doy - 1] || 1;
+  const scale = v_ng > 0 ? (v_ng / baseAt) : 1;
+  const curve = base.map(x => x * scale);
+  plotState.curve = curve;   // <-- add this
 
+
+  // --- y range after curve is known
+  const yMin = 0;
+  const maxCurve = Math.max(30, maxArr(curve, 30));
+  const yMax = Math.max(50, Math.ceil(maxCurve / 5) * 5);
+
+  // save mapping for click handler
+  plotState.x0 = x0; plotState.x1 = x1;
+  plotState.y0 = y0; plotState.y1 = y1;
+  plotState.yMin = yMin; plotState.yMax = yMax;
+  plotState.daysMax = daysMax;
+
+  ctx.clearRect(0,0,W,H);
+  
   // nadir (projected day)
   let nadirDay = 1, nadirVal = curve[0];
   for (let i=1;i<curve.length;i++){
     if (curve[i] < nadirVal){ nadirVal = curve[i]; nadirDay = i+1; }
   }
-
-  const yMax = Math.max(50, Math.ceil(Math.max(...curve, 30)/5)*5);
-  const yMin = 0;
 
   const xMap = x => x0 + (x-1)/(365-1)*plotW;
   const yMap = y => y1 - (y-yMin)/(yMax-yMin)*plotH;
