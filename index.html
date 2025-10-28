@@ -580,7 +580,7 @@ function sizeCanvasForViewport() {
   const rect = cv.getBoundingClientRect();
   const keyboardInset = window.visualViewport ? (window.visualViewport.height - window.innerHeight) : 0;
   const remaining = Math.max(0, window.innerHeight - rect.top - 20 - keyboardInset);
-  const targetH = Math.max(window.innerHeight * 0.5, Math.round(remaining * 0.9)); // ~50% of remainder
+  const targetH = Math.max(window.innerHeight * 0.5, Math.round(remaining * 0.5));
   cv.style.height = `${targetH}px`;
   draw();
 }
