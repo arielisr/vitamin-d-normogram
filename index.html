@@ -578,12 +578,67 @@ const PHONE_BP = 640; // px
 
 function sizeCanvasForViewport() {
   const rect = cv.getBoundingClientRect();
+  const vw   = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  const vh   = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+  // Available vertical space under the top of the canvas (accounts for banner/toolbar already)
   const keyboardInset = window.visualViewport ? (window.visualViewport.height - window.innerHeight) : 0;
-  const remaining = Math.max(0, window.innerHeight - rect.top - 20 - keyboardInset);
-  const targetH = Math.max(window.innerHeight * 0.5, Math.round(remaining * 0.5));
+  const remaining = Math.max(0, vh - rect.top - 12 - keyboardInset);
+
+  // Simple device buckets
+  const isPhone        = window.matchMedia('(max-width: 640px)').matches;
+  const isTablet       = window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
+  const isLandscape    = window.matchMedia('(orientation: landscape)').matches;
+
+  // width-based aspect cap so the plot does not get too squat on wide screens
+  // 0.58 roughly ~ 16:9 to 3:2 feel; tweak to taste
+  const widthAspectCap = Math.round(vw * 0.58);
+
+  let targetH;
+
+  if (isPhone) {
+    if (isLandscape) {
+      // Phone landscape: keep modest height so banners + toolbar still fit
+      targetH = Math.min(
+        Math.round(vh * 0.55),
+        Math.round(remaining * 0.70),
+        widthAspectCap
+      );
+      targetH = clamp(targetH, 200, 360);
+    } else {
+      // Phone portrait
+      targetH = Math.min(
+        Math.round(vh * 0.60),
+        Math.round(remaining * 0.65),
+        widthAspectCap
+      );
+      targetH = clamp(targetH, 260, 420);
+    }
+  } else if (isTablet) {
+    // Tablets: give more room
+    targetH = Math.min(
+      Math.round(vh * 0.68),
+      Math.round(remaining * 0.80),
+      Math.round(vw * 0.60) // aspect guard
+    );
+    targetH = clamp(targetH, 360, 560);
+  } else {
+    // Desktops/laptops
+    targetH = Math.min(
+      Math.round(vh * 0.72),  // use a good chunk of viewport height
+      Math.round(remaining * 0.90),
+      Math.round(vw * 0.58)   // width-aspect guard
+    );
+    targetH = clamp(targetH, 420, 720);
+  }
+
+  // Never exceed the actual remaining space
+  targetH = Math.min(targetH, remaining);
+
   cv.style.height = `${targetH}px`;
   draw();
 }
+
 
 // call this instead of calling sizeCanvasForViewport() directly
 function relayoutCanvas() {
