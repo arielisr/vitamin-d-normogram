@@ -285,7 +285,7 @@ html[dir="rtl"] .value-row .radio{
 <div class="field field--value">
   <div class="value-row"  dir="ltr">
     <div class="input-col">
-      <label id="lblValue">25(OH)D value</label>
+      <label id="lblValue">Measured 25(OH)D</label>
       <input id="vitd" type="number" min="0" max="70" step="1" value="25" inputmode="decimal">
       <div class="hint" id="unitHint">= 50.0 nmol/L</div>
     </div>
@@ -351,7 +351,7 @@ const STR = {
   en: {
     docTitle: 'Vitamin D Calendar Adjustment',
     bannerTitle: 'Vitamin D Calendar Adjustment',
-    lblValue: '25(OH)D value',
+    lblValue: 'Measured 25(OH)D',
     unitNg: 'ng/mL',
     unitNmol: 'nmol/L',
     lblDate: 'Date of measurement',
@@ -374,7 +374,7 @@ const STR = {
     ],
     axisX: 'Day of year',
     axisY: '25-OH Vitamin D (ng/mL)',
-    nadir: 'Nadir'
+    nadir: 'Estimated nadir'
   },
   he: {
     docTitle: 'ויטמין די מתוקן לתאריך',
@@ -402,7 +402,7 @@ const STR = {
     ],
     axisX: 'יום בשנה',
     axisY: `${LRI}25-OH Vitamin D (ng/mL)${PDI}`,
-    nadir: 'שפל'
+    nadir: 'שפל מוערך'
   }
 };
 
@@ -885,7 +885,7 @@ function draw(){
   const nadirDateTxt = dateFmtMonthDay(nadirDate);
   const nadirNgTxt   = `${LRI}${nadirVal.toFixed(1)}${NBSP}${STR[LANG].unitNg}${PDI}`;
   const nadirNmolTxt = `(${LRI}${toNmol(nadirVal).toFixed(0)}${NBSP}${STR[LANG].unitNmol}${PDI})`;
-  ctx.fillText(`${STR[LANG].nadir} • ${nadirDateTxt}`, Xn, y0 + 2);
+  ctx.fillText(`${STR[LANG].nadir}`, Xn, y0 + 2);
   ctx.font=boldFont;
   ctx.fillText(nadirNgTxt,   Xn, y0 + 16);
   ctx.font=normalFont;
