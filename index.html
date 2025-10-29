@@ -312,7 +312,7 @@ html[dir="rtl"] .value-row .radio{
   <div class="wrap">
     <div class="toolbar one-line">
 <div class="field field--value">
-  <div class="value-row">
+  <div class="value-row" dir="ltr">
     <div class="input-col">
       <label id="lblValue">25(OH)D value</label>
       <input id="vitd" type="number" min="0" max="70" step="1" value="25" inputmode="decimal">
@@ -371,6 +371,10 @@ html[dir="rtl"] .value-row .radio{
   </div>
 
 <script>
+const LRI = "\u2066";   // start LTR isolate
+const PDI = "\u2069";   // pop directional isolate
+const NBSP = "\u00A0";
+
 /* ---------- i18n strings ---------- */
 const STR = {
   en: {
@@ -402,11 +406,11 @@ const STR = {
     nadir: 'Nadir'
   },
   he: {
-    docTitle: 'ויטמין די מתוקן לתאריך השנה',
-    bannerTitle: 'ויטמין די מתוקן לתאריך השנה',
-    lblValue: 'ערך 25(OH)D',
-    unitNg: 'נג/מ״ל',
-    unitNmol: 'ננומול/ל׳',
+    docTitle: 'ויטמין די מתוקן לתאריך',
+    bannerTitle: 'ויטמין די מתוקן לתאריך',
+    lblValue: `${LRI}25(OH)D${PDI}`,
+    unitNg: 'ng/mL',
+    unitNmol: 'nnmol/L',
     lblDate: 'תאריך המדידה',
     hintDate: 'מעגן את העקומה העונתית',
     advTitle: 'מתקדם: מקדמי עונתיות',
@@ -902,28 +906,34 @@ function draw(){
   dot(Xd, Yd, '#2457a0');   // measurement (blue)
   dot(Xn, Yn, '#ef4444');   // nadir/projected (red)
 
+  const normalFont = "12px system-ui";
+  const boldFont   = "bold 12px system-ui";
   // top-boundary annotations (month-day only; units on separate lines)
   ctx.fillStyle='#111';
-  ctx.font='12px system-ui, Arial';
   ctx.textAlign='center';
   ctx.textBaseline='top';
-
+  ctx.font=normalFont;
+  
   // measurement
   const measDateTxt = dateFmtMonthDay(d);
-  const measNgTxt   = `${v_ng.toFixed(1)} ${STR[LANG].unitNg}`;
-  const measNmolTxt = `${toNmol(v_ng).toFixed(0)} ${STR[LANG].unitNmol}`;
+  const measNgTxt   = `${LRI}${v_ng.toFixed(1)}${NBSP}${STR[LANG].unitNg}${PDI}`;
+  const measNmolTxt = `(${LRI}${toNmol(v_ng).toFixed(0)}${NBSP}${STR[LANG].unitNmol}${PDI})`;
   ctx.fillText(measDateTxt, Xd, y0 + 2);
+  ctx.font=boldFont;
   ctx.fillText(measNgTxt,   Xd, y0 + 16);
+  ctx.font=normalFont;
   ctx.fillText(measNmolTxt, Xd, y0 + 30);
 
   // nadir (in same year as measurement)
   const nadirDate = new Date(d.getFullYear(), 0, 1); nadirDate.setDate(nadirDay);
   const nadirDateTxt = dateFmtMonthDay(nadirDate);
-  const nadirNgTxt   = `${nadirVal.toFixed(1)} ${STR[LANG].unitNg}`;
-  const nadirNmolTxt = `${toNmol(nadirVal).toFixed(0)} ${STR[LANG].unitNmol}`;
+  const nadirNgTxt   = `${LRI}${nadirVal.toFixed(1)}${NBSP}${STR[LANG].unitNg}${PDI}`;
+  const nadirNmolTxt = `(${LRI}${toNmol(nadirVal).toFixed(0)}${NBSP}${STR[LANG].unitNmol}${PDI})`;
   ctx.fillText(`${STR[LANG].nadir} • ${nadirDateTxt}`, Xn, y0 + 2);
-  ctx.fillText(nadirNgTxt,                               Xn, y0 + 16);
-  ctx.fillText(nadirNmolTxt,                             Xn, y0 + 30);
+  ctx.font=boldFont;
+  ctx.fillText(nadirNgTxt,   Xn, y0 + 16);
+  ctx.font=normalFont;
+  ctx.fillText(nadirNmolTxt, Xn, y0 + 30);
 
   // axis labels
   ctx.save();
