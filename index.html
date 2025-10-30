@@ -3,7 +3,25 @@
 <head>
 <meta charset="utf-8">
 <title>Vitamin D Calendar Adjustment</title>
+<link rel="canonical" href="https://arielisr.github.io/vitamin-d-normogram/">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="title" content="Vitamin D seasonal normogram">
+<meta name="description" content="Convert and interpret 25(OH)D across seasons: ng/mL ↔ nmol/L, with date-aware normalization.">
+<meta name="author" content="Leumit Research Institute">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Vitamin D Normogram">
+<meta property="og:url" content="https://arielisr.github.io/vitamin-d-normogram/">
+<meta property="og:title" content="Vitamin D seasonal normogram">
+<meta property="og:description" content="Convert and interpret 25(OH)D across seasons: ng/mL ↔ nmol/L, with date-aware normalization.">
+<meta property="og:image" content="https://arielisr.github.io/vitamin-d-normogram/og/preview_en.png">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="he_IL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://arielisr.github.io/vitamin-d-normogram/">
+<meta name="twitter:title" content="Vitamin D seasonal normogram">
+<meta name="twitter:description" content="Convert and interpret 25(OH)D across seasons: ng/mL ↔ nmol/L, with date-aware normalization.">
+<meta name="twitter:image" content="https://arielisr.github.io/vitamin-d-normogram/og/preview_en.png">
 <style>
 :root{
   --bg:#ffffff; --card:#fff; --ink:#1f2937; --muted:#6b7280;
@@ -216,6 +234,11 @@ html[dir="rtl"] .value-row .radio{
 </head>
 <script>window.process = window.process || { env: {} };</script>
 <script type="module">
+// Ariel Israel, MD PhD
+// aisrael -at- leumit.co.il
+// (C) Leumit Research Institute, Oct 2025
+// All rights reserved
+// Do not reproduce, distribute and/or adapt any part of the page without written permission from the author.
   import { initializeApp }     from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
   import { getAnalytics, isSupported, logEvent, setUserProperties }
     from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
@@ -1093,6 +1116,118 @@ document.getElementById('unitGroup')?.addEventListener('change', sizeCanvasForVi
   // If device stops matching, auto-close
   mq.addEventListener('change', () => {
     if (!isPhone() && isOpen) closeModal(false);
+  });
+})();
+
+(function () {
+  const onReady = (fn) =>
+    (document.readyState === 'loading')
+      ? document.addEventListener('DOMContentLoaded', fn)
+      : fn();
+
+  const qs = () => new URLSearchParams(location.search);
+  const isISO = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s);
+  const toNum = (s) => (s == null ? NaN : Number.parseFloat(String(s).replace(',', '.')));
+
+  function setParam(k, v) {
+    const p = qs();
+    if (v == null || String(v).trim() === '') p.delete(k);
+    else p.set(k, String(v));
+    history.replaceState(null, '', location.pathname + '?' + p.toString());
+  }
+
+  function fire(el) {
+    el.dispatchEvent(new Event('input',  { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  onReady(() => {
+    let inSetup = true;
+
+    // Existing controls
+    const selLang  = document.getElementById('langSel');         // <select id="langSel">
+    const vitd     = document.getElementById('vitd');            // <input id="vitd" type="number">
+    const dateEl   = document.getElementById('measureDate');     // <input id="measureDate" type="date">
+    const unitEls  = Array.from(document.querySelectorAll('input[name="unit"]')); // radios: value="ng"|"nmol"
+
+    // Helpers to set state the way your app expects
+    function setLang(lang) {
+      if (!selLang) return;
+      if (lang === 'en' || lang === 'he') {
+        selLang.value = lang;
+        fire(selLang);
+      }
+    }
+    function setUnit(unit) {
+      const radio = unitEls.find(r => r.value === unit);
+      if (radio) {
+        radio.checked = true;
+        fire(radio);
+      }
+    }
+    function setValue(v) {
+      if (!vitd) return;
+      vitd.value = v;
+      fire(vitd);
+    }
+    function setDate(d) {
+      if (!dateEl) return;
+      dateEl.value = d;
+      fire(dateEl);
+    }
+
+    // 1) Apply initial params from URL (order: lang, unit, value, date)
+    const p = qs();
+
+    const qLang = (p.get('lang') || '').toLowerCase();
+    if (qLang) setLang(qLang);
+
+    const qUnit = (p.get('unit') || '').toLowerCase();
+    if (qUnit === 'ng' || qUnit === 'nmol') setUnit(qUnit);
+
+    const qValRaw = p.get('value');
+    const qValNum = toNum(qValRaw);
+    if (Number.isFinite(qValNum)) setValue(qValNum);
+
+    const qDate = p.get('date');
+    if (qDate && isISO(qDate)) setDate(qDate);
+
+    inSetup = false;
+
+    // 2) Keep URL synced with UI (no history spam)
+    if (selLang) {
+      selLang.addEventListener('change', () => {
+        if (!inSetup) setParam('lang', selLang.value);
+      });
+    }
+
+    unitEls.forEach(r => {
+      r.addEventListener('change', () => {
+        if (!inSetup && r.checked) setParam('unit', r.value);
+      });
+    });
+
+    if (vitd) {
+      const syncVal = () => {
+        if (inSetup) return;
+        const t = vitd.value.trim();
+        if (t === '') return setParam('value', '');
+        const x = toNum(t);
+        if (Number.isFinite(x)) setParam('value', x);
+      };
+      vitd.addEventListener('input', syncVal);
+      vitd.addEventListener('change', syncVal);
+    }
+
+    if (dateEl) {
+      const syncDate = () => {
+        if (inSetup) return;
+        const d = dateEl.value;
+        setParam('date', isISO(d) ? d : '');
+      };
+      dateEl.addEventListener('input', syncDate);
+      dateEl.addEventListener('change', syncDate);
+    }
   });
 })();
 
