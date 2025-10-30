@@ -88,7 +88,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
   width:var(--fieldw); max-width:100%; font-size:16px; padding:6px 8px;
   border:1px solid #e5e7eb; border-radius:10px; font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
 }
-.field input[type="date"]{ width:115px; }
+.field input[type="date"]{ width:120px; }
 .hint{ color:var(--muted); font-size:12px; margin-top:4px;}
 
 .toolbar.one-line{
@@ -293,13 +293,15 @@ html[dir="rtl"] .value-row .radio{
     <div class="banner-wrap">
       <img class="hero" alt="Leumit Research banner" src="https://arielisr.github.io/lri-newsletter/graphics/leumit_banner_300DPI.png">
       <div class="banner-title" id="bannerTitle">Vitamin D Calendar Adjustment</div>
-      <div class="banner-lang">
-        <label for="langSel" class="visually-hidden">Language</label>
-        <select id="langSel" aria-label="Language">
-          <option value="en">English</option>
-          <option value="he">עברית</option>
-        </select>
-      </div>
+	<div class="banner-lang">
+	  <label for="langSel" class="visually-hidden">Language</label>
+	  <select id="langSel" aria-label="Language">
+		<option value="en">English</option>
+		<option value="he">עברית</option>
+		<option value="ru">Русский</option>
+		<option value="ar">العربية</option>
+	  </select>
+	</div>
     </div>
   </div>
 
@@ -404,7 +406,7 @@ const STR = {
     bannerTitle: 'ויטמין די מתוקן לתאריך',
     lblValue: `${LRI}25(OH)D${PDI}`,
     unitNg: 'ng/mL',
-    unitNmol: 'nnmol/L',
+    unitNmol: 'nmol/L',
     lblDate: 'תאריך המדידה',
     hintDate: 'מעגן את העקומה העונתית',
     advTitle: 'מתקדם: מקדמי עונתיות',
@@ -426,22 +428,109 @@ const STR = {
     axisX: 'יום בשנה',
     axisY: `${LRI}25-OH Vitamin D (ng/mL)${PDI}`,
     nadir: 'שפל מוערך'
+  },
+  ru: {
+    docTitle: 'Календарная коррекция витамина D',
+    bannerTitle: 'Календарная коррекция витамина D',
+    lblValue: 'Измеренный 25(OH)D',
+    unitNg: 'нг/мл',
+    unitNmol: 'нмоль/л',
+    lblDate: 'Дата измерения',
+    hintDate: 'Закрепляет сезонную кривую',
+    advTitle: 'Дополнительно: сезонные коэффициенты',
+    advHint: 'Кривая = exp(const + a·sin(θ) + b·cos(θ) + c·sin(2θ) + d·cos(2θ)), θ=2π·день/365.25. Введённое значение масштабирует кривую на выбранную дату.',
+    coef_const: 'const',
+    coef_sin1: 'season_sin',
+    coef_cos1: 'season_cos',
+    coef_sin2: 'season_sin2',
+    coef_cos2: 'season_cos2',
+    bandsHint: 'Диапазоны: Очень тяжёлый <5, Тяжёлый 5–10, Умеренный 10–15, Лёгкий 15–20, Недостаток 20–30, Достаточный ≥30 нг/мл',
+    bands: [
+      { key:'verySevere', label:'Очень тяжёлый дефицит' },
+      { key:'severe',     label:'Тяжёлый дефицит' },
+      { key:'moderate',   label:'Умеренный дефицит' },
+      { key:'mild',       label:'Лёгкий дефицит' },
+      { key:'insuff',     label:'Недостаток' },
+      { key:'suff',       label:'Достаточный уровень' }
+    ],
+    axisX: 'День года',
+    axisY: '25-OH Витамин D (нг/мл)',
+    nadir: 'Оценённый минимум'
+  },
+  ar: {
+    docTitle: 'تصحيح فيتامين د حسب التقويم',
+    bannerTitle: 'تصحيح فيتامين د حسب التقويم',
+    lblValue: '25(OH)D المقاس',
+    unitNg: 'ng/mL',
+    unitNmol: 'nmol/L',
+    lblDate: 'تاريخ القياس',
+    hintDate: 'يثبت منحنى المواسم',
+    advTitle: 'متقدم: معاملات موسمية',
+    advHint: 'المنحنى = exp(const + a·sin(θ) + b·cos(θ) + c·sin(2θ) + d·cos(2θ)), ‏θ=2π·اليوم/365.25. يُعيد إدخال القيمة تحجيم المنحنى في التاريخ المحدد.',
+    coef_const: 'const',
+    coef_sin1: 'season_sin',
+    coef_cos1: 'season_cos',
+    coef_sin2: 'season_sin2',
+    coef_cos2: 'season_cos2',
+    bandsHint: 'النطاقات: نقص حاد جدًا <5، نقص حاد 5–10، نقص متوسط 10–15، نقص خفيف 15–20، عدم كفاية 20–30، كافٍ ≥30 ng/mL',
+    bands: [
+      { key:'verySevere', label:'نقص حاد جدًا' },
+      { key:'severe',     label:'نقص حاد' },
+      { key:'moderate',   label:'نقص متوسط' },
+      { key:'mild',       label:'نقص خفيف' },
+      { key:'insuff',     label:'عدم كفاية' },
+      { key:'suff',       label:'كافٍ' }
+    ],
+    axisX: 'يوم السنة',
+    axisY: '25-OH فيتامين د (ng/mL)',
+    nadir: 'الحد الأدنى المقدّر'
   }
 };
 
 /* ---------- locale helpers ---------- */
+// Allowed languages
+const LANGS = new Set(['en','he','ru','ar']);
+
+// Normalize browser codes (e.g., iw -> he, ar-IL -> ar)
+function normalizeLangTag(tag) {
+  if (!tag) return '';
+  const t = String(tag).toLowerCase();
+  if (t.startsWith('iw')) return 'he'; // legacy Hebrew code
+  if (t.startsWith('he')) return 'he';
+  if (t.startsWith('ar')) return 'ar';
+  if (t.startsWith('ru')) return 'ru';
+  return 'en';
+}
+
 function getInitialLang(){
   const urlLang = new URLSearchParams(location.search).get('lang');
-  if (urlLang === 'he' || urlLang === 'en') return urlLang;
-  return (navigator.language || '').toLowerCase().startsWith('he') ? 'he' : 'en';
+  if (LANGS.has(urlLang)) return urlLang;
+
+  // Look through navigator.languages first (best signal), then navigator.language
+  const langs = Array.isArray(navigator.languages) && navigator.languages.length
+    ? navigator.languages
+    : [navigator.language || ''];
+
+  for (const tag of langs) {
+    const norm = normalizeLangTag(tag);
+    if (LANGS.has(norm)) return norm;
+  }
+  return 'en';
 }
 let LANG = getInitialLang();
 
 function applyLang(lang){
-  LANG = (lang === 'he') ? 'he' : 'en';
+  LANG = LANGS.has(lang) ? lang : 'en';
   const S = STR[LANG];
+
+  // RTL for Hebrew and Arabic
+  const isRTL = (LANG === 'he' || LANG === 'ar');
   document.documentElement.lang = LANG;
-  document.documentElement.dir  = (LANG === 'he') ? 'rtl' : 'ltr';
+  document.documentElement.dir  = isRTL ? 'rtl' : 'ltr';
+
+  // If you use an RTL CSS helper class, toggle it here:
+  // document.documentElement.classList.toggle('rtl', isRTL);
+
   document.title = S.docTitle;
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
@@ -460,12 +549,28 @@ function applyLang(lang){
   set('coef_cos2', S.coef_cos2);
   set('bandsHint', S.bandsHint);
 
+  // If you display axis labels by ID, set them too (optional)
+  // set('axisX', S.axisX);
+  // set('axisY', S.axisY);
+  // set('nadir', S.nadir);
+
   const sel = document.getElementById('langSel');
   if (sel && sel.value !== LANG) sel.value = LANG;
 
   updateUnitHint();
   draw();
 }
+
+// Hook: keep URL in sync if user changes language manually
+document.getElementById('langSel')?.addEventListener('change', (e) => {
+  const lang = e.target.value;
+  applyLang(lang);
+
+  // reflect in the URL without adding history entries
+  const p = new URLSearchParams(location.search);
+  p.set('lang', lang);
+  history.replaceState(null, '', location.pathname + '?' + p.toString());
+});
 
 /* ---------- plotting utilities ---------- */
 function maxArr(arr, fallback = 0){
