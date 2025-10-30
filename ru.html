@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Remove noindex when you want it publicly indexed -->
+  <meta name="robots" content="noindex, nofollow"> 
+  
+  <link rel="canonical" href="https://arielisr.github.io/vitamin-d-normogram/">
+
+  <title>Сезонная нормировка витамина D</title>
+  <meta name="description" content="Преобразование и сезонная интерпретация 25(OH)D: ng/mL ↔ nmol/L, с нормировкой по дате.">
+  <meta name="author" content="Leumit Research Institute">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Vitamin D Normogram">
+  <meta property="og:url" content="https://arielisr.github.io/vitamin-d-normogram/ru.html">
+  <meta property="og:title" content="Сезонная нормировка витамина D">
+  <meta property="og:description" content="Преобразование и сезонная интерпретация 25(OH)D: ng/mL ↔ nmol/L, с нормировкой по дате.">
+  <meta property="og:image" content="https://arielisr.github.io/vitamin-d-normogram/og/preview_ru.png">
+  <meta property="og:locale" content="ru_RU">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://arielisr.github.io/vitamin-d-normogram/ru.html">
+  <meta name="twitter:title" content="Сезонная нормировка витамина D">
+  <meta name="twitter:description" content="Преобразование и сезонная интерпретация 25(OH)D: ng/mL ↔ nmol/L, с нормировкой по дате.">
+  <meta name="twitter:image" content="https://arielisr.github.io/vitamin-d-normogram/og/preview_ru.png">
+</head>
+<body>
+  <noscript>
+    В этом браузере отключён JavaScript. Перейдите к приложению:
+    <a href="/vitamin-d-normogram/?lang=ru">vitamin-d-normogram/?lang=ru</a>
+  </noscript>
+  <script>
+    // Redirect to main app, preserving existing query params and forcing lang=ru
+    (function () {
+      var base = '/vitamin-d-normogram/';
+      var p = new URLSearchParams(location.search);
+      p.set('lang', 'ru'); // force Russian
+      // Optional defaults:
+      // if (!p.has('unit')) p.set('unit','nmol');
+      // if (!p.has('date')) p.set('date', new Date().toISOString().slice(0,10));
+      var target = base + (p.toString() ? ('?' + p.toString()) : '');
+      location.replace(target); // do not keep this page in history
+    })();
+  </script>
+</body>
+</html>
