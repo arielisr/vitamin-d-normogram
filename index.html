@@ -110,7 +110,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
   border:1px solid #e5e7eb; border-radius:10px; font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
 }
 .field input[type="date"]{ width:120px; }
-.hint{ color:var(--muted); font-size:12px; margin-top:0px;}
+.hint{ color:var(--muted); font-size:12px; margin-top:4px;}
 
 .toolbar.one-line{
   display:flex; align-items:flex-end; gap:12px;
@@ -211,7 +211,7 @@ html[dir="rtl"] .toolbar.one-line{ direction:rtl; }
 }
 
 .input-col .hint{
-  margin-top:4px;
+  margin-top:0px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -233,7 +233,7 @@ html[dir="rtl"] .value-row .radio{
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 2px 0;
+  padding: 2px 2px;
   background: transparent;
   position: relative;
 }
@@ -248,7 +248,7 @@ html[dir="rtl"] .value-row .radio{
   width: auto;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .banner-logos {
     justify-content: center;
   }
@@ -744,7 +744,7 @@ function sizeCanvasForViewport() {
       // Phone portrait
       targetH = Math.min(
         Math.round(vh * 0.70),
-        Math.round(remaining * 0.75)
+        Math.round(remaining * 0.80)
       );
       targetH = clamp(targetH, 260, 420);
     }
