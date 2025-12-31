@@ -9,6 +9,10 @@
 <meta name="title" content="Vitamin D seasonal normogram">
 <meta name="description" content="Convert and interpret 25(OH)D across seasons: ng/mL ↔ nmol/L, with date-aware normalization.">
 <meta name="author" content="Leumit Research Institute">
+<meta name="copyright" content="© 2025 Leumit Research Institute">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+<meta name="DC.rights" content="© 2025 Leumit Research Institute. All rights reserved." />
+<meta name="DC.publisher" content="Leumit Research Institute" />
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vitamin D Normogram">
 <meta property="og:url" content="https://arielisr.github.io/vitamin-d-normogram/">
@@ -234,11 +238,19 @@ html[dir="rtl"] .value-row .radio{
 </head>
 <script>window.process = window.process || { env: {} };</script>
 <script type="module">
-// Ariel Israel, MD PhD
-// aisrael -at- leumit.co.il
-// (C) Leumit Research Institute, Oct 2025
-// All rights reserved
-// Do not reproduce, distribute and/or adapt any part of the page without written permission from the author.
+/*
+ * Vitamin D Seasonal Normogram (Calendar Adjustment Tool)
+ * Author: Ariel Israel, MD PhD
+ * Contact: aisrael@leumit.co.il
+ * Copyright © 2025 Leumit Health Services. All rights reserved.
+ *
+ * This tool adjusts measured 25(OH)D levels for date of collection
+ * using a Fourier-based seasonal model derived from population data.
+ *
+ * Unauthorized reproduction, distribution, modification, or adaptation
+ * of any part of this code or associated content is prohibited without
+ * prior written permission from the author and Leumit Health Services.
+ */
   import { initializeApp }     from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
   import { getAnalytics, isSupported, logEvent, setUserProperties }
     from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
