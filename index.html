@@ -228,6 +228,26 @@ html[dir="rtl"] .value-row .radio{
   .value-row .radio{ order:2; }
 }
 
+.banner-logos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
+  background: transparent;
+  position: relative;
+}
+
+.logo-left {
+  height: 80px;
+  width: auto;
+}
+
+.logo-right {
+  height: 80px;
+  width: auto;
+}
+
 @media (max-width: 640px){
   html, body { margin:0; padding:0; }
 
@@ -251,6 +271,7 @@ html[dir="rtl"] .value-row .radio{
   .banner, .banner-title { padding-left: 0; padding-right: 0; }
   
 }
+
 </style>
 </head>
 <script>window.process = window.process || { env: {} };</script>
@@ -380,9 +401,16 @@ html[dir="rtl"] .value-row .radio{
       <div class="hint" id="bandsHint">Bands: Very-severe &lt;5, Severe 5–10, Moderate 10–15, Mild 15–20, Insufficiency 20–30, Sufficiency ≥30 ng/mL</div>
   </div>
   <div class="wrap wrap--banner">
-    <img class="footer-ribbon" alt="Leumit Research Institute ribbon" src="https://arielisr.github.io/lri-newsletter/graphics/leumit_tailer_300DPI.png">
-  </div>
+  <div class="banner-logos">
+    <!-- Tulip logo on the left -->
+    <img src="https://arielisr.github.io/lri-newsletter/graphics/leumit_tulip.png" 
+         alt="Leumit tulip logo" class="logo-left">
 
+    <!-- Full English logo on the right -->
+    <img src="https://arielisr.github.io/lri-newsletter/graphics/logo_new_eng.png" 
+         alt="Leumit Research Institute" class="logo-right">
+  </div>
+</div>
 <script>
 const LRI = "\u2066";   // start LTR isolate
 const PDI = "\u2069";   // pop directional isolate
