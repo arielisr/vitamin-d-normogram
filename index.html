@@ -827,8 +827,10 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('orientationchange', () => {
   // two passes to survive address-bar jiggles on mobile
   relayoutCanvas();
-  setTimeout(relayoutCanvas, 250);
-  window.scrollTo(0, 1);
+  setTimeout(function() {
+    relayoutCanvas();
+    window.scrollTo(0, 1);
+  }, 1);
 });
 
   // Re-run on viewport changes (address bar show/hide on mobile)
@@ -848,7 +850,9 @@ window.addEventListener('orientationchange', () => {
   const aboveCanvas = document.querySelector('.card'); // or a container above your canvas
   const ro = new ResizeObserver(relayoutCanvas);
   if (aboveCanvas) ro.observe(aboveCanvas);
-  window.scrollTo(0, 1);
+  setTimeout(function() {
+    window.scrollTo(0, 1);
+  }, 0);
 });
 
 function isSmallViewport(){
