@@ -58,7 +58,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 .card{ background:var(--card); border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,.06); padding:2px; margin:0; }
 
 .banner-wrap{ position:relative; }
-.hero{ width:100%; height:auto; display:block; border-radius:10px; }
+.hero{ width:100%; height:auto; display:block; border-radius:10px;   object-fit: contain;  }
 .banner-title{
   position:absolute; left:50%; top:30%; transform:translate(-50%,-50%);
   color:#fff; font-weight:700; text-align:center; line-height:1.15;
@@ -94,8 +94,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
     width: 100%;
     height: auto;
     max-height: 35vh;
-    object-fit: contain;     /* Shows full image, may add letterboxing */
-    /* or remove object-fit and fixed height entirely */
+    object-fit: cover;
   }
 }
 
@@ -120,6 +119,12 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
   .banner-lang select {
     font-size: 12px;
     padding: 4px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero {
+    max-height: 15vh;
   }
 }
 
