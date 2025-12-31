@@ -862,7 +862,7 @@ function draw(){
   const W = cv.clientWidth, H = cv.clientHeight;
   const isSmall = isSmallViewport();
   const isLandscape = isLandscapeViewport();
-  const m = isSmall ? {l:20, r:5, t:10, b:30} : {l:36, r:130, t:10, b:40};
+  const m = isSmall ? {l:20, r:5, t:10, b:30} : {l:36, r:130, t:isLandscape?5:20, b:isLandscape?22:40};
   const x0 = m.l, x1 = W - m.r, y0 = m.t, y1 = H - m.b;
   const plotW = x1 - x0, plotH = y1 - y0;
 
@@ -1081,7 +1081,7 @@ function draw(){
 
   // remove the left y-axis legend on small screens
   if (!isSmall) {
-    ctx.fillText(STR[LANG].axisX, (x0 + x1) / 2, H - 6);
+    //ctx.fillText(STR[LANG].axisX, (x0 + x1) / 2, H - 6);
     ctx.translate(16, (y0 + y1) / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillText(STR[LANG].axisY, 0, 0);
