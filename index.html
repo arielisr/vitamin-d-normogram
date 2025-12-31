@@ -347,18 +347,6 @@ html[dir="rtl"] .value-row .radio{
   <div class="hint" id="hintDate">Anchors the seasonal curve</div>
 </div>
     </div>
-
-      <details hidden>
-        <summary id="advTitle">Advanced: seasonal coefficients</summary>
-        <div class="coef-grid" style="margin-top:8px;">
-          <div class="coef"><label id="coef_const">const</label>        <input id="p_const" type="number" step="0.000001" value="2.86504436"></div>
-          <div class="coef"><label id="coef_sin1">season_sin</label>    <input id="p_sin1"  type="number" step="0.000001" value="-0.19078822"></div>
-          <div class="coef"><label id="coef_cos1">season_cos</label>    <input id="p_cos1"  type="number" step="0.000001" value="-0.17079543"></div>
-          <div class="coef"><label id="coef_sin2">season_sin2</label>   <input id="p_sin2"  type="number" step="0.000001" value="0.01443204"></div>
-          <div class="coef"><label id="coef_cos2">season_cos2</label>   <input id="p_cos2"  type="number" step="0.000001" value="0.00978268"></div>
-        </div>
-        <div class="hint" id="advHint">Curve = exp(const + a·sin(θ) + b·cos(θ) + c·sin(2θ) + d·cos(2θ)), θ=2π·day/365.25. Your input rescales the curve at the chosen date.</div>
-      </details>
       <canvas id="plot" width="1200" height="520"></canvas>
       <div class="hint" id="bandsHint">Bands: Very-severe &lt;5, Severe 5–10, Moderate 10–15, Mild 15–20, Insufficiency 20–30, Sufficiency ≥30 ng/mL</div>
   </div>
@@ -381,13 +369,6 @@ const STR = {
     unitNmol: 'nmol/L',
     lblDate: 'Date of measurement',
     hintDate: 'Anchors the seasonal curve',
-    advTitle: 'Advanced: seasonal coefficients',
-    advHint: 'Curve = exp(const + a·sin(θ) + b·cos(θ) + c·sin(2θ) + d·cos(2θ)), θ=2π·day/365.25. Your input rescales the curve at the chosen date.',
-    coef_const: 'const',
-    coef_sin1: 'season_sin',
-    coef_cos1: 'season_cos',
-    coef_sin2: 'season_sin2',
-    coef_cos2: 'season_cos2',
     bandsHint: 'Bands: Very-severe <5, Severe 5–10, Moderate 10–15, Mild 15–20, Insufficiency 20–30, Sufficiency ≥30 ng/mL',
     bands: [
       { key:'verySevere', label:'Very-severe deficiency' },
@@ -409,13 +390,6 @@ const STR = {
     unitNmol: 'nmol/L',
     lblDate: 'תאריך המדידה',
     hintDate: 'מעגן את העקומה העונתית',
-    advTitle: 'מתקדם: מקדמי עונתיות',
-    advHint: 'עקומה = exp(const + a·sin(θ) + b·cos(θ) + c·sin(2θ) + d·cos(2θ)), ‏θ=2π·יום/365.25. הערך שהוזן מתאים את העקומה לתאריך.',
-    coef_const: 'const',
-    coef_sin1: 'season_sin',
-    coef_cos1: 'season_cos',
-    coef_sin2: 'season_sin2',
-    coef_cos2: 'season_cos2',
     bandsHint: 'תחומים: חוסר חמור מאוד <5, חוסר חמור 5–10, חוסר בינוני 10–15, חוסר קל 15–20, חוסר 20–30, מספק ≥30 נג/מ״ל',
     bands: [
       { key:'verySevere', label:'חוסר חמור מאוד' },
@@ -432,18 +406,11 @@ const STR = {
   ru: {
     docTitle: 'Календарная коррекция витамина D',
     bannerTitle: 'Календарная коррекция витамина D',
-    lblValue: '25(OH)D',
+    lblValue: 'Измеренный 25(OH)D',
     unitNg: 'нг/мл',
     unitNmol: 'нмоль/л',
     lblDate: 'Дата измерения',
     hintDate: 'Закрепляет сезонную кривую',
-    advTitle: 'Дополнительно: сезонные коэффициенты',
-    advHint: 'Кривая = exp(const + a·sin(θ) + b·cos(θ) + c·sin(2θ) + d·cos(2θ)), θ=2π·день/365.25. Введённое значение масштабирует кривую на выбранную дату.',
-    coef_const: 'const',
-    coef_sin1: 'season_sin',
-    coef_cos1: 'season_cos',
-    coef_sin2: 'season_sin2',
-    coef_cos2: 'season_cos2',
     bandsHint: 'Диапазоны: Очень тяжёлый <5, Тяжёлый 5–10, Умеренный 10–15, Лёгкий 15–20, Недостаток 20–30, Достаточный ≥30 нг/мл',
     bands: [
       { key:'verySevere', label:'Очень тяжёлый дефицит' },
@@ -465,13 +432,6 @@ const STR = {
     unitNmol: 'nmol/L',
     lblDate: 'تاريخ القياس',
     hintDate: 'يثبت منحنى المواسم',
-    advTitle: 'متقدم: معاملات موسمية',
-    advHint: 'المنحنى = exp(const + a·sin(θ) + b·cos(θ) + c·sin(2θ) + d·cos(2θ)), ‏θ=2π·اليوم/365.25. يُعيد إدخال القيمة تحجيم المنحنى في التاريخ المحدد.',
-    coef_const: 'const',
-    coef_sin1: 'season_sin',
-    coef_cos1: 'season_cos',
-    coef_sin2: 'season_sin2',
-    coef_cos2: 'season_cos2',
     bandsHint: 'النطاقات: نقص حاد جدًا <5، نقص حاد 5–10، نقص متوسط 10–15، نقص خفيف 15–20، عدم كفاية 20–30، كافٍ ≥30 ng/mL',
     bands: [
       { key:'verySevere', label:'نقص حاد جدًا' },
@@ -540,13 +500,6 @@ function applyLang(lang){
   set('unitNmol', S.unitNmol);
   set('lblDate', S.lblDate);
   set('hintDate', S.hintDate);
-  set('advTitle', S.advTitle);
-  set('advHint', S.advHint);
-  set('coef_const', S.coef_const);
-  set('coef_sin1', S.coef_sin1);
-  set('coef_cos1', S.coef_cos1);
-  set('coef_sin2', S.coef_sin2);
-  set('coef_cos2', S.coef_cos2);
   set('bandsHint', S.bandsHint);
 
   // If you display axis labels by ID, set them too (optional)
@@ -616,13 +569,18 @@ function monthLabelFor(monthIndex, year){
   return new Intl.DateTimeFormat(LANG, { month: 'short' }).format(d);
 }
 
-function buildSeason(days, p){
+function buildSeason(days, p) {
   const out = new Array(days.length);
-  for (let i=0;i<days.length;i++){
+  const omega = 2 * Math.PI / 365.25;
+  for (let i = 0; i < days.length; i++) {
     const t = days[i];
-    const theta = 2*Math.PI*t/365.25;
-    const valLog = p.const + p.sin1*Math.sin(theta) + p.cos1*Math.cos(theta)
-                 + p.sin2*Math.sin(2*theta) + p.cos2*Math.cos(2*theta);
+    let valLog = p.const;
+    for (let k = 1; k <= 8; k++) {
+      const angle = k * omega * t;
+      const sinKey = 'sin' + k;
+      const cosKey = 'cos' + k;
+      valLog += p[sinKey] * Math.sin(angle) + p[cosKey] * Math.cos(angle);
+    }
     out[i] = Math.exp(valLog);
   }
   return out;
@@ -842,11 +800,23 @@ function draw(){
   const doy = clamp(dayOfYear(d), 1, 365);
 
   const p = {
-    const: parseFloat(document.getElementById('p_const').value || '2.86504436'),
-    sin1:  parseFloat(document.getElementById('p_sin1').value  || '-0.19078822'),
-    cos1:  parseFloat(document.getElementById('p_cos1').value  || '-0.17079543'),
-    sin2:  parseFloat(document.getElementById('p_sin2').value  || '0.01443204'),
-    cos2:  parseFloat(document.getElementById('p_cos2').value  || '0.00978268'),
+	  const:  2.75145949,
+	  sin1:  -0.19640784,
+	  cos1:  -0.17189752,
+	  sin2:   0.01193693,
+	  cos2:   0.00768729,
+	  sin3:   0.01205368,
+	  cos3:  -0.00959092,
+	  sin4:  -0.00579821,
+	  cos4:   0.00407145,
+	  sin5:  -0.00099733,
+	  cos5:  -0.00657994,
+	  sin6:  -0.00196533,
+	  cos6:  -0.00320386,
+	  sin7:  -0.00183577,
+	  cos7:  -0.00400819,
+	  sin8:  -0.00385140,
+	  cos8:  -0.00265219
   };
 
   // --- build base curve and scale it to pass through the input at the chosen date
@@ -1061,10 +1031,6 @@ document.getElementById('langSel').addEventListener('change', (e)=>{
   applyLang(e.target.value);
 });
 
-// live reactive inputs
-['vitd','p_const','p_sin1','p_cos1','p_sin2','p_cos2'].forEach(id=>{
-  document.getElementById(id).addEventListener('input', ()=>{ updateUnitHint(); draw(); });
-});
 document.querySelectorAll('input[name="unit"]').forEach(r => r.addEventListener('change', ()=>{ updateUnitHint(); draw(); }));
 document.getElementById('measureDate').addEventListener('change', draw);
 // Initial sizing
