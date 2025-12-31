@@ -784,7 +784,7 @@ function sizeCanvasForViewport() {
   }
   // Available vertical space under the top of the canvas (accounts for banner/toolbar already)
   const keyboardInset = window.visualViewport ? (window.visualViewport.height - window.innerHeight) : 0;
-  const remaining = Math.max(0, vh - (keyboardInset + height_logo + height_bands + height_hero + height_toolbar));
+  const remaining = Math.max(0, vh - (keyboardInset + height_logo + height_bands + height_hero + height_toolbar + 4));
   let targetH = remaining;
   cv.style.height = `${targetH}px`;
   draw();
@@ -867,7 +867,7 @@ function draw(){
   const W = cv.clientWidth, H = cv.clientHeight;
   const isSmall = isSmallViewport();
   const isLandscape = isLandscapeViewport();
-  const m = isSmall ? {l:20, r:5, t:10, b:30} : {l:36, r:130, t:isLandscape?5:20, b:isLandscape?22:40};
+  const m = isSmall ? {l:20, r:5, t:isLandscape?5:20, b:isLandscape?22:40} : {l:36, r:130, t:20, b:40};
   const x0 = m.l, x1 = W - m.r, y0 = m.t, y1 = H - m.b;
   const plotW = x1 - x0, plotH = y1 - y0;
 
