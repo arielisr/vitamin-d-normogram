@@ -87,11 +87,15 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color
 /* On narrow/short screens (phones) */
 @media (max-height: 700px) {
   .banner-wrap {
-    max-height: 35vh;         /* Smaller banner when height is constrained */
+    max-height: 35vh;
+    overflow: hidden;
   }
   .hero {
-    height: 35vh;
-    object-fit: cover;        /* Crop top/bottom to fill height nicely */
+    width: 100%;
+    height: auto;
+    max-height: 35vh;
+    object-fit: contain;     /* Shows full image, may add letterboxing */
+    /* or remove object-fit and fixed height entirely */
   }
 }
 
@@ -259,19 +263,21 @@ html[dir="rtl"] .value-row .radio{
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 2px 0;
-  margin-top: 10px;
+  padding: 0px 0;
+  margin-top: 0px;
   background: transparent;
   position: relative;
 }
 
 .logo-left {
   height: 60px;
+  padding: 10px;
   width: auto;
 }
 
 .logo-right {
-  height: 75px;
+  height: 60px;
+  padding: 10px;
   width: auto;
 }
 
@@ -773,7 +779,7 @@ function sizeCanvasForViewport() {
   }
   // Available vertical space under the top of the canvas (accounts for banner/toolbar already)
   const keyboardInset = window.visualViewport ? (window.visualViewport.height - window.innerHeight) : 0;
-  const remaining = Math.max(0, vh - (20 + keyboardInset + height_logo + height_bands + height_hero + height_toolbar));
+  const remaining = Math.max(0, vh - (keyboardInset + height_logo + height_bands + height_hero + height_toolbar + 10));
   let targetH = remaining;
   cv.style.height = `${targetH}px`;
   draw();
@@ -811,16 +817,6 @@ document.addEventListener('DOMContentLoaded', () => {
       hero.addEventListener('error', relayoutCanvas, { once: true });
     }
   }
-// Also relayout when the footer ribbon loads
-const footer = document.querySelector('.footer-ribbon');
-if (footer) {
-  if (footer.complete) {
-    relayoutCanvas();
-  } else {
-    footer.addEventListener('load',  relayoutCanvas, { once: true });
-    footer.addEventListener('error', relayoutCanvas, { once: true });
-  }
-}
 
 // On orientation change, recalc after the UI settles
 window.addEventListener('orientationchange', () => {
