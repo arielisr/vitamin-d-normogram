@@ -233,20 +233,44 @@ html[dir="rtl"] .value-row .radio{
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  padding: 20px 0;
   background: transparent;
   position: relative;
 }
 
 .logo-left {
   height: 60px;
-  width: auto;
   padding: 20px;
+  width: auto;
 }
 
 .logo-right {
   height: 75px;
-  width: auto;
   padding: 20px;
+  width: auto;
+}
+
+/* On narrow screens: hide left logo, center the right one */
+@media (max-width: 500px) {
+  .banner-logos {
+    justify-content: center;
+    padding: 16px 0;
+  }
+
+  .logo-left {
+    display: none;
+  }
+
+  .logo-right {
+    height: 65px;
+  }
+}
+
+/* Optional: even smaller screens (e.g. very narrow phones) */
+@media (max-width: 480px) {
+  .logo-right {
+    height: 55px;
+  }
 }
 
 @media (max-width: 640px){
