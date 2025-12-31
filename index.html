@@ -240,36 +240,29 @@ html[dir="rtl"] .value-row .radio{
 
 .logo-left {
   height: 60px;
-  padding: 20px;
   width: auto;
 }
 
 .logo-right {
   height: 75px;
-  padding: 20px;
   width: auto;
 }
 
-/* On narrow screens: hide left logo, center the right one */
-@media (max-width: 500px) {
+@media (max-width: 768px) {
   .banner-logos {
     justify-content: center;
-    padding: 16px 0;
   }
-
   .logo-left {
     display: none;
   }
-
   .logo-right {
     height: 65px;
   }
 }
 
-/* Optional: even smaller screens (e.g. very narrow phones) */
-@media (max-width: 480px) {
-  .logo-right {
-    height: 55px;
+@media (orientation: landscape) and (max-height: 600px) {
+  .banner-logos {
+    display: none;
   }
 }
 
@@ -737,10 +730,6 @@ function sizeCanvasForViewport() {
   const isTablet       = window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
   const isLandscape    = window.matchMedia('(orientation: landscape)').matches;
 
-  // width-based aspect cap so the plot does not get too squat on wide screens
-  // 0.58 roughly ~ 16:9 to 3:2 feel; tweak to taste
-  const widthAspectCap = Math.round(vw * 0.58);
-
   let targetH;
 
   if (isPhone) {
@@ -748,16 +737,14 @@ function sizeCanvasForViewport() {
       // Phone landscape: keep modest height so banners + toolbar still fit
       targetH = Math.min(
         Math.round(vh * 0.55),
-        Math.round(remaining * 0.70),
-        widthAspectCap
+        Math.round(remaining * 0.70)
       );
       targetH = clamp(targetH, 200, 360);
     } else {
       // Phone portrait
       targetH = Math.min(
-        Math.round(vh * 0.60),
-        Math.round(remaining * 0.65),
-        widthAspectCap
+        Math.round(vh * 0.70),
+        Math.round(remaining * 0.75)
       );
       targetH = clamp(targetH, 260, 420);
     }
