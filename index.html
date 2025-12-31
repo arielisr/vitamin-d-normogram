@@ -757,7 +757,7 @@ function sizeCanvasForViewport() {
   const isTablet       = window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
   const isLandscape    = window.matchMedia('(orientation: landscape)').matches;
   const hide_logo = isPhone && isLandscape;
-  const hide_bands = (!isSmallViewport()) | (isLandscape); 
+  const hide_bands = true;//(!isSmallViewport()) | (isLandscape); 
   const logos_el = document.querySelector('.banner-logos');
   if (logos_el) logos_el.hidden = hide_logo;
   const bands_el = document.getElementById('bandsHint');
@@ -1012,6 +1012,17 @@ function draw(){
       if (yy<yMin || yy>yMax) return;
       const label = STR[LANG].bands[idx].label;
 	  const xText = rtl ? (W-8) : (x1+8);
+      ctx.fillText(label, xText, yMap(yy));
+    });
+  } else {
+      ctx.textAlign = rtl ? 'center' : 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#111';
+    bands.forEach((b, idx)=>{
+      const yy = Math.min((b.y0+b.y1)/2, yMax-0.001);
+      if (yy<yMin || yy>yMax) return;
+      const label = STR[LANG].bands[idx].label;
+	  const xText = (x0+x1) / 2;
       ctx.fillText(label, xText, yMap(yy));
     });
   }
